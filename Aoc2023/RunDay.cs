@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Aoc2023.Cli;
 
 /// <summary>
@@ -7,11 +8,17 @@ public class RunDay : ICommand
 {
     private RunDayReceiver _receiver;
     private string _day;
-    public RunDay(RunDayReceiver receiver, string day) {
+    private string _part;
+    private string _filepath;
+    public RunDay(RunDayReceiver receiver, string filepath, string day, string part)
+    {
         this._receiver = receiver;
         this._day = day;
+        this._part = part;
+        this._filepath = filepath;
     }
-    public void Execute () {
-        this._receiver.RunDay(this._day);
+    public void Execute()
+    {
+        this._receiver.RunDay(this._filepath, this._day, this._part);
     }
 }

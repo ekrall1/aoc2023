@@ -1,6 +1,24 @@
 
-public class RunDayReceiver {
-    public void RunDay(string day) {
-        Console.WriteLine($"Run Day {day}");
+using Aoc2023.Days;
+public class RunDayReceiver
+{
+
+    private readonly Dictionary<string, Func<string, Day>> _days = new Dictionary<string, Func<string, Day>> {
+        {"1", filepath => new Day1(filepath)}
+    };
+    public void RunDay(string filepath, string day, string part)
+    {
+        if (_days.TryGetValue(day, out Func<string, Day>? dayRunner))
+        {
+            Day runner = dayRunner(filepath);
+            if (part == "1")
+            {
+                Console.WriteLine($"part 1 solution is: {runner.Part1()}");
+            }
+            if (part == "2")
+            {
+                Console.WriteLine($"part 2 solution is: {runner.Part2()}");
+            }
+        }
     }
 }

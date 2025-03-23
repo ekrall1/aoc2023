@@ -24,4 +24,8 @@
     <ProjectReference Include="..\Aoc2023\Aoc2023.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestInput\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
