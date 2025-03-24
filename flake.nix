@@ -24,6 +24,8 @@
 
         };
 
+        lib = nixpkgs.lib;
+
         vscode = (
           pkgs.vscode-with-extensions.override {
             vscodeExtensions = with pkgs.vscode-extensions; [
@@ -44,8 +46,11 @@
         azure-iac-env = with pkgs; [
           pulumi-bin
           pulumiPackages.pulumi-language-go
-          azure-cli
           go
+        ];
+
+        azure-cli = pkgs.azure-cli.withExtensions [
+          pkgs.azure-cli-extensions.azure-devops
         ];
 
       in
@@ -55,6 +60,7 @@
             dotnet
             vscode
             azure-iac-env
+            azure-cli
           ];
 
           shellHook = ''

@@ -1,0 +1,7 @@
+name: aoc2023
+description: aoc2023 infrastructure
+runtime: go
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: go
