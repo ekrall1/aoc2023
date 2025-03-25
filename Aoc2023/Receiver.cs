@@ -4,7 +4,8 @@ public class RunDayReceiver
 {
 
     private readonly Dictionary<string, Func<string, Day>> _days = new Dictionary<string, Func<string, Day>> {
-        {"1", filepath => new Day1(filepath)}
+        {"1", filepath => new Day1(filepath)},
+        {"2", filepath => new Day2(filepath)},
     };
     public void RunDay(string filepath, string day, string part)
     {
