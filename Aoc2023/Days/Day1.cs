@@ -29,7 +29,7 @@ public class Day1 : Day
         };
     }
 
-    private char firstDigitChar(char[] line)
+    private char FirstDigitChar(char[] line)
     {
         foreach (char ch in line)
         {
@@ -40,26 +40,26 @@ public class Day1 : Day
         }
         return '0';
     }
-    private int firstAndLastToInt(string line)
+    private int FirstAndLastToInt(string line)
     {
         char[] charArray = line.ToCharArray();
-        char firstChar = firstDigitChar(charArray);
+        char firstChar = FirstDigitChar(charArray);
         Array.Reverse(charArray);
-        char lastChar = firstDigitChar(charArray);
+        char lastChar = FirstDigitChar(charArray);
         return int.Parse(firstChar.ToString() + lastChar.ToString());
     }
 
-    private int iterInputListP1(List<string> lines)
+    private int IterInputListP1(List<string> lines)
     {
         int finalSum = 0;
         foreach (string line in lines)
         {
-            finalSum += firstAndLastToInt(line.ToLower());
+            finalSum += FirstAndLastToInt(line.ToLower());
         }
         return finalSum;
     }
 
-    private Trie createTrie()
+    private Trie CreateTrie()
     {
         Trie trie = new Trie();
         foreach (string number in this._digitStrings.Keys)
@@ -69,12 +69,12 @@ public class Day1 : Day
         return trie;
     }
 
-    private string lookupValidNumberInSubstr(Trie trie, string substring)
+    private string LookupValidNumberInSubstr(Trie trie, string substring)
     {
         return trie.StartsWithWord(substring);
     }
 
-    private char getDigitCharForNumber(string numberName)
+    private char GetDigitCharForNumber(string numberName)
     {
         if (this._digitStrings.TryGetValue(numberName, out char intChar))
         {
@@ -83,7 +83,7 @@ public class Day1 : Day
         throw new InvalidDataException($"number name {numberName} does not exist in input dictionary");
     }
 
-    private char iterateWordForMatch(Trie trie, string word)
+    private char IterateWordForMatch(Trie trie, string word)
     {
         for (int i = 0; i <= word.Length - 1; i++)
         {
@@ -92,7 +92,7 @@ public class Day1 : Day
                 return word[i];
             }
             string substr = word.Substring(i);
-            string valid = lookupValidNumberInSubstr(trie, substr);
+            string valid = LookupValidNumberInSubstr(trie, substr);
             if (valid.Length > 0)
             {
                 if (this._digitStrings.TryGetValue(valid, out char intChar))
@@ -104,7 +104,7 @@ public class Day1 : Day
         throw new InvalidDataException("there is no digit in the string");
     }
 
-    private char iterateWordForMatchReverse(Trie trie, string word)
+    private char IterateWordForMatchReverse(Trie trie, string word)
     {
         for (int i = word.Length - 1; i >= 0; i--)
         {
@@ -113,7 +113,7 @@ public class Day1 : Day
                 return word[i];
             }
             string substr = word.Substring(i);
-            string valid = lookupValidNumberInSubstr(trie, substr);
+            string valid = LookupValidNumberInSubstr(trie, substr);
             if (valid.Length > 0)
             {
                 if (this._digitStrings.TryGetValue(valid, out char intChar))
@@ -125,43 +125,43 @@ public class Day1 : Day
         throw new InvalidDataException("there is no digit in the string");
     }
 
-    private int firstAndLastToIntP2(Trie trie, string line)
+    private int FirstAndLastToIntP2(Trie trie, string line)
     {
-        char firstChar = iterateWordForMatch(trie, line);
-        char lastChar = iterateWordForMatchReverse(trie, line);
+        char firstChar = IterateWordForMatch(trie, line);
+        char lastChar = IterateWordForMatchReverse(trie, line);
         return int.Parse(firstChar.ToString() + lastChar.ToString());
     }
 
-    private int iterInputListP2(List<string> lines)
+    private int IterInputListP2(List<string> lines)
     {
-        Trie trie = createTrie();
+        Trie trie = CreateTrie();
         int finalSum = 0;
         foreach (string line in lines)
         {
-            finalSum += firstAndLastToIntP2(trie, line.ToLower());
+            finalSum += FirstAndLastToIntP2(trie, line.ToLower());
         }
         return finalSum;
     }
 
 
-    private string solvePart1(List<string> lines)
+    private string SolvePart1(List<string> lines)
     {
-        return iterInputListP1(lines).ToString();
+        return IterInputListP1(lines).ToString();
     }
 
-    private string solvePart2(List<string> lines)
+    private string SolvePart2(List<string> lines)
     {
-        return iterInputListP2(lines).ToString();
+        return IterInputListP2(lines).ToString();
     }
 
     string Day.Part1()
     {
-        return solvePart1(this._inputList);
+        return SolvePart1(this._inputList);
     }
 
     string Day.Part2()
     {
-        return solvePart2(this._inputList);
+        return SolvePart2(this._inputList);
     }
 
 }
