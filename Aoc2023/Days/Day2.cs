@@ -54,39 +54,49 @@ public class Day2 : Day
         return int.Parse(input.Split(separator3, StringSplitOptions.TrimEntries)[1]);
     }
 
+    private bool IsValidGame(string game) {
+        var cubes = ParseCubes(game);
+        return cubes.All(cube => cube.count <= maximums[cube.color]);
+    }
+
     private string IterInputListP1(List<string> lines) {
-        int totalSum = 0;
-        foreach (string line in lines) {
-            var colorCounts = new ColorMap().colorMap;
-            string[] parts = line.Split(':');
-            int gameId = GetGameId(parts[0]);
-
-            var games = ParseGames(parts[1]);
-
-            bool isValid = false;
-            foreach(string game in games) {
-                var cubes = ParseCubes(game);
-                isValid = cubes.All(cube => cube.count <= maximums[cube.color]);
-                if (!isValid) {
-                    break;
-                }
-            }
-            if (isValid) {
-                totalSum += gameId;
-            }
-        }
+        int totalSum = lines
+            .Select(line => line.Split(':'))
+            .Select(parts => new { GameId = GetGameId(parts[0]), Games = ParseGames(parts[1])})
+            .Where(entry => entry.Games.All(IsValidGame))
+            .Sum(entry => entry.GameId);
         return totalSum.ToString();
+    }
+
+    private string IterInputListP2(List<string> lines) {
+        int totalPower = lines
+            .Select(line => line.Split(':')[1])
+            .Select(ParseGames)
+            .Select(games =>
+            {
+                var maxCounts = new Dictionary<string, int> { {"red", 0}, {"green", 0}, {"blue", 0} };
+
+                foreach (var game in games) {
+                    foreach (var (color, count) in ParseCubes(game)) {
+                        maxCounts[color] = Math.Max(maxCounts[color], count);
+                    }
+                }
+
+            return maxCounts["red"] * maxCounts["green"] * maxCounts["blue"];
+            }).Sum();
+
+        return totalPower.ToString();
     }
 
 
     private string SolvePart1(List<string> lines)
     {
-        return IterInputListP1(lines).ToString();
+        return IterInputListP1(lines);
     }
 
     private string SolvePart2(List<string> lines)
     {
-        return "not implemented";
+        return IterInputListP2(lines);
     }
 
     string Day.Part1()
