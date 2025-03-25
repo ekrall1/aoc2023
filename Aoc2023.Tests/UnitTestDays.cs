@@ -45,4 +45,45 @@ public class UnitTestDays
         var output = writer.ToString().Trim();
         Assert.Equal("part 2 solution is: 281", output);
     }
+
+    [Fact]
+    public void Test_Day2_Part1()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day2.txt");
+
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "2", "1"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 1 solution is: 8", output);
+    }
+
+
+    [Fact]
+    public void Test_Day2_Part2()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day2.txt");
+
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "2", "2"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 2 solution is: 2286", output);
+    }
 }
