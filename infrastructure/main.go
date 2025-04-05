@@ -27,13 +27,14 @@ func main() {
 			return nil
 		}
 
-		devopsProject, err := DevopsProjectStack.DevopsStack(ctx, provider)
+		devopsProject, err := DevopsProjectStack.DevopsStack(ctx, provider, resource.ResourceGroup)
 
 		ctx.Export("resource group for aoc2023", resource.ResourceGroup)
 		ctx.Export("devops project name", devopsProject.ProjectName)
 		ctx.Export("sp client id", devopsProject.ServicePrincipalClientId)
 		ctx.Export("sp clienttenant", devopsProject.ServicePrincipalTenant)
 		ctx.Export("secret", devopsProject.ServicePrincipalSecret)
+		ctx.Export("pipeline id", devopsProject.PipelineId)
 
 		return nil
 	})

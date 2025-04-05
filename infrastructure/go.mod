@@ -7,6 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/pulumi/pulumi-azure-native-sdk/resources/v2 v2.89.3
 	github.com/pulumi/pulumi-azure-native-sdk/v2 v2.89.3
+	github.com/pulumi/pulumi-azure/sdk/v6 v6.22.0
 	github.com/pulumi/pulumi-azuread/sdk/v6 v6.2.0
 	github.com/pulumi/pulumi-azuredevops/sdk/v3 v3.8.0
 	github.com/pulumi/pulumi/sdk/v3 v3.157.0
