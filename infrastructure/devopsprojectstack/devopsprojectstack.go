@@ -162,6 +162,7 @@ func DevopsStack(ctx *pulumi.Context, providerLocation *sdk.Provider, resourceGr
 		CiTrigger: &devops.BuildDefinitionCiTriggerArgs{
 			UseYaml: pulumi.Bool(true),
 		},
+		QueueStatus: pulumi.String("enabled"),
 	})
 	if err != nil {
 		return DevopsOutputs{}, err
