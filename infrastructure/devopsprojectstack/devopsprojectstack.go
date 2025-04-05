@@ -156,7 +156,7 @@ func DevopsStack(ctx *pulumi.Context, providerLocation *sdk.Provider, resourceGr
 			RepoType:            pulumi.String("GitHub"),
 			RepoId:              pulumi.String("ekrall1/aoc2023"),
 			BranchName:          pulumi.String("main"),
-			YmlPath:             pulumi.String("azure-pipelines.yml"),
+			YmlPath:             pulumi.String("infrastructure/azure-pipelines.yml"),
 			ServiceConnectionId: serviceEndpoint.ID(),
 		},
 		CiTrigger: &devops.BuildDefinitionCiTriggerArgs{
