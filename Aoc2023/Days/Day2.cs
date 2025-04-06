@@ -1,11 +1,12 @@
-using System.Runtime.CompilerServices;
 using Aoc2023.Days;
 using Aoc2023.Input;
 
-public class ColorMap {
+public class ColorMap
+{
 
     public Dictionary<string, int> colorMap;
-    public ColorMap() {
+    public ColorMap()
+    {
         this.colorMap = new Dictionary<string, int> {
             {"red", 0},
             {"green", 0},
@@ -36,7 +37,8 @@ public class Day2 : Day
         this._inputList = fileInput.ReadLines();
     }
 
-    static List<(string color, int count)> ParseCubes(string game) {
+    static List<(string color, int count)> ParseCubes(string game)
+    {
         return game
             .Split(separator2, StringSplitOptions.TrimEntries)
             .Select(item => item.Split(separator3, StringSplitOptions.TrimEntries))
@@ -44,7 +46,8 @@ public class Day2 : Day
             .ToList();
     }
 
-    static string[] ParseGames(string input) {
+    static string[] ParseGames(string input)
+    {
         return input
             .Split(separator1, StringSplitOptions.TrimEntries);
     }
@@ -54,35 +57,40 @@ public class Day2 : Day
         return int.Parse(input.Split(separator3, StringSplitOptions.TrimEntries)[1]);
     }
 
-    private bool IsValidGame(string game) {
+    private bool IsValidGame(string game)
+    {
         var cubes = ParseCubes(game);
         return cubes.All(cube => cube.count <= maximums[cube.color]);
     }
 
-    private string IterInputListP1(List<string> lines) {
+    private string IterInputListP1(List<string> lines)
+    {
         int totalSum = lines
             .Select(line => line.Split(':'))
-            .Select(parts => new { GameId = GetGameId(parts[0]), Games = ParseGames(parts[1])})
+            .Select(parts => new { GameId = GetGameId(parts[0]), Games = ParseGames(parts[1]) })
             .Where(entry => entry.Games.All(IsValidGame))
             .Sum(entry => entry.GameId);
         return totalSum.ToString();
     }
 
-    private string IterInputListP2(List<string> lines) {
+    private string IterInputListP2(List<string> lines)
+    {
         int totalPower = lines
             .Select(line => line.Split(':')[1])
             .Select(ParseGames)
             .Select(games =>
             {
-                var maxCounts = new Dictionary<string, int> { {"red", 0}, {"green", 0}, {"blue", 0} };
+                var maxCounts = new Dictionary<string, int> { { "red", 0 }, { "green", 0 }, { "blue", 0 } };
 
-                foreach (var game in games) {
-                    foreach (var (color, count) in ParseCubes(game)) {
+                foreach (var game in games)
+                {
+                    foreach (var (color, count) in ParseCubes(game))
+                    {
                         maxCounts[color] = Math.Max(maxCounts[color], count);
                     }
                 }
 
-            return maxCounts["red"] * maxCounts["green"] * maxCounts["blue"];
+                return maxCounts["red"] * maxCounts["green"] * maxCounts["blue"];
             }).Sum();
 
         return totalPower.ToString();
