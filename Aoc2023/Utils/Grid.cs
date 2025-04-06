@@ -30,7 +30,7 @@ namespace Aoc2023
 
         }
 
-        public List<char> NeighborsOf((int, int) loc)
+        public List<char> NeighborsOfChar((int, int) loc)
         {
             (int, int)[] dxdy = [(0, 1), (1, 0), (-1, 0), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1)];
             List<char> neighbors = [];
@@ -55,7 +55,33 @@ namespace Aoc2023
 
             return neighbors;
         }
+        public List<(int, int)> NeighborsOfCoord((int, int) loc)
+        {
+            (int, int)[] dxdy = [(0, 1), (1, 0), (-1, 0), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1)];
+            List<(int, int)> neighbors = [];
+
+            for (int i = 0; i < dxdy.Length; i++)
+            {
+                int dx = loc.Item1 + dxdy[i].Item1;
+                int dy = loc.Item2 + dxdy[i].Item2;
+
+                if (dx < 0 || dy < 0)
+                {
+                    continue;
+                }
+
+                if (dx >= this.rows || dy >= this.cols[dx])
+                {
+                    continue;
+                }
+
+                neighbors.Add((dx, dy));
+            }
+
+            return neighbors;
+        }
     }
+
 
 }
 

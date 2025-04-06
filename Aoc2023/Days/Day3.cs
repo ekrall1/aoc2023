@@ -2,6 +2,7 @@ using Aoc2023;
 using Aoc2023.Days;
 using Aoc2023.Input;
 using Aoc2023.Utils;
+using System.Runtime.InteropServices;
 using System.Text;
 
 public class Day3 : Day
@@ -9,20 +10,93 @@ public class Day3 : Day
 
     private string _filepath;
     private List<string> _inputList;
-    private Dictionary<(int, int), int> _numberMap;
+    private Dictionary<(int, int), (int, (int, int))> _numberMap;
+    private List<(int, int)> _gears;
 
     public Day3(string filepath)
     {
         this._filepath = filepath;
         InputReader fileInput = new InputReader(this._filepath);
         this._inputList = fileInput.ReadLines();
-        this._numberMap = new Dictionary<(int, int), int> { };
+        this._numberMap = new Dictionary<(int, int), (int, (int, int))> { };
+        this._gears = [];
     }
-    private int FindSum()
+
+    private Grid MakeGrid()
     {
         var grid = new Grid();
-        var finalSum = 0;
         grid.Create(this._inputList);
+        return grid;
+    }
+
+    private void FillGears(Grid grid)
+    {
+        {
+            for (int i = 0; i < grid.rows; i++)
+            {
+                for (int j = 0; j < grid.cols[i]; j++)
+                {
+                    if (grid.gridMap[(i, j)] == '*')
+                    {
+                        this._gears.Add((i, j));
+                    }
+                }
+            }
+        }
+    }
+
+    private void FillNumberMap(Grid grid)
+    {
+        {
+            for (int i = 0; i < grid.rows; i++)
+            {
+                for (int j = 0; j < grid.cols[i]; j++)
+                {
+                    if (char.IsDigit(grid.gridMap[(i, j)]))
+                    {
+                        var startCoord = (i, j);
+                        var (coords, strNum) = ExtractNumber(i, ref j, grid);
+                        if (int.TryParse(strNum, out var finalNum))
+                        {
+                            coords.ForEach(coord => this._numberMap[coord] = (finalNum, startCoord));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private int GearProduct(Grid grid)
+    {
+        var sumProduct = 0;
+        for (int i = 0; i < this._gears.Count; i++)
+        {
+            var neighbors = grid.NeighborsOfCoord(this._gears[i]);
+            if (neighbors == null)
+            {
+                continue;
+            }
+            var prod = 0;
+            var visited = new HashSet<(int, (int, int))> { };
+            neighbors.ForEach(neighbor =>
+            {
+                if (this._numberMap.ContainsKey(neighbor) && !visited.Contains(this._numberMap[neighbor]))
+                {
+                    prod = Math.Max(prod, 1) * this._numberMap[neighbor].Item1;
+                    visited.Add(this._numberMap[neighbor]);
+                }
+            });
+            if (visited.Count > 1)
+            {
+                sumProduct += prod;
+            }
+
+        }
+        return sumProduct;
+    }
+    private int FindSum(Grid grid)
+    {
+        var finalSum = 0;
 
         for (int i = 0; i < grid.rows; i++)
         {
@@ -33,7 +107,6 @@ public class Day3 : Day
                     var (coords, strNum) = ExtractNumber(i, ref j, grid);
 
                     finalSum += SumPart(strNum, coords, grid);
-
                 }
             }
         }
@@ -51,7 +124,7 @@ public class Day3 : Day
         {
             for (int idx = 0; idx < coords.Count; idx++)
             {
-                var neighbors = grid.NeighborsOf(coords[idx]);
+                var neighbors = grid.NeighborsOfChar(coords[idx]);
                 if (neighbors.Count(c => c == '.' || char.IsDigit(c)) != neighbors.Count)
                 {
                     return finalNum;
@@ -85,12 +158,16 @@ public class Day3 : Day
 
     string Day.Part1()
     {
-        return this.FindSum().ToString();
+        var grid = MakeGrid();
+        return this.FindSum(grid).ToString();
     }
 
     string Day.Part2()
     {
-        return string.Join(",", this._inputList);
+        var grid = MakeGrid();
+        this.FillGears(grid);
+        this.FillNumberMap(grid);
+        return this.GearProduct(grid).ToString();
     }
 
 }
