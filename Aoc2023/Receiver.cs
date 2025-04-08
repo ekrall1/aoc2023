@@ -7,6 +7,7 @@ public class RunDayReceiver
         {"1", filepath => new Day1(filepath)},
         {"2", filepath => new Day2(filepath)},
         {"3", filepath => new Day3(filepath)},
+        {"4", filepath => new Day4(filepath)},
     };
     public void RunDay(string filepath, string day, string part)
     {
