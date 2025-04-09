@@ -17,10 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Aoc2023\Aoc2023.csproj" />
   </ItemGroup>
 

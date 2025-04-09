@@ -19,13 +19,13 @@ steps:
       installationPath: $(Agent.ToolsDirectory)/dotnet
 
   - script: |
-      dotnet restore
+      dotnet restore Aoc2023/Aoc2023.sln
     displayName: 'Restore project'
 
   - script: |
-      dotnet build --configuration Release
+      dotnet build Aoc2023/Aoc2023.sln --configuration $(buildConfiguration)
     displayName: 'Build project'
 
   - script: |
-      dotnet test Aoc2023.Tests/ --verbosity normal --configuration Release
+      dotnet test Aoc2023/Aoc2023.sln --verbosity normal --configuration $(buildConfiguration)
     displayName: 'Run unit tests'
