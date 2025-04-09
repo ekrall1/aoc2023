@@ -12,11 +12,13 @@ public class Day4 : Day
 
     private string _filepath;
     private List<string> _inputList;
+    private Dictionary<int, int> _cardCounts;
     public Day4(string filepath)
     {
         this._filepath = filepath;
         InputReader fileInput = new InputReader(this._filepath);
         this._inputList = fileInput.ReadLines();
+        this._cardCounts = new Dictionary<int, int>();
     }
 
     private static (List<int> winning, List<int> have) ParseCard(string line)
@@ -56,7 +58,7 @@ public class Day4 : Day
 
     }
 
-    private static int BuildAndSearchTree(List<int> winning, List<int> have)
+    private static int BuildAndSearchTreePart1(List<int> winning, List<int> have)
     {
 
         var root = BinarySearchTree.BuildBalancedBST(winning, 0, winning.Count - 1);
@@ -75,20 +77,54 @@ public class Day4 : Day
 
     }
 
+    private static int BuildAndSearchTreePart2(List<int> winning, List<int> have)
+    {
+
+        var root = BinarySearchTree.BuildBalancedBST(winning, 0, winning.Count - 1);
+
+        var score = 0;
+
+        have.ForEach(num =>
+        {
+            if (BinarySearchTree.Search(root, num) != null)
+            {
+                score += 1;
+            }
+        });
+
+        return score;
+
+    }
+
     string Day.Part1()
     {
         var totalWinning = 0;
         this._inputList.ForEach(card =>
         {
             var (winning, have) = ParseCard(card);
-            totalWinning += BuildAndSearchTree(winning, have);
+            totalWinning += BuildAndSearchTreePart1(winning, have);
         });
         return totalWinning.ToString();
     }
 
     string Day.Part2()
     {
-        return "not implemented yet";
+        foreach (var (card, idx) in this._inputList.Select((card, idx) => (card, idx)))
+        {
+            this._cardCounts[idx + 1] = this._cardCounts.GetValueOrDefault(idx + 1, 0) + 1;
+            var (winning, have) = ParseCard(card);
+            var cardsWon = BuildAndSearchTreePart2(winning, have);
+            for (var i = 0; i < cardsWon; i++)
+            {
+                if (idx + 2 + i <= this._inputList.Count)
+                {
+                    this._cardCounts[idx + i + 2] = this._cardCounts.GetValueOrDefault(idx + i + 2, 0) + 1 * this._cardCounts[idx + 1];
+                }
+            }
+
+        }
+        return this._cardCounts.Values.Sum().ToString();
+
     }
 
 }
