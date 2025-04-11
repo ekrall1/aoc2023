@@ -11,4 +11,12 @@
     <Folder Include="Input\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\krall\Source\Repos\aoc2023\Aoc2023\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\krall\Source\Repos\aoc2023\Aoc2023\.editorconfig" />
+  </ItemGroup>
+
 </Project>

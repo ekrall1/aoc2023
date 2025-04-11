@@ -2,8 +2,14 @@ namespace Aoc2023.Utils
 {
     public class TrieNode
     {
-        public Dictionary<char, TrieNode> Children { get; set; }
-        public bool EndOfWord { get; set; }
+        public Dictionary<char, TrieNode> Children
+        {
+            get; set;
+        }
+        public bool EndOfWord
+        {
+            get; set;
+        }
 
         public TrieNode()
         {
