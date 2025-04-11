@@ -1,9 +1,7 @@
+using System.Text;
 using Aoc2023;
 using Aoc2023.Days;
 using Aoc2023.Input;
-using Aoc2023.Utils;
-using System.Runtime.InteropServices;
-using System.Text;
 
 public class Day3 : Day
 {

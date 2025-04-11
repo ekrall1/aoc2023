@@ -1,11 +1,8 @@
+using System.Data;
+using System.Text.RegularExpressions;
 using Aoc2023;
 using Aoc2023.Days;
 using Aoc2023.Input;
-using Aoc2023.Utils;
-using System.Data;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
 
 public class Day4 : Day
 {

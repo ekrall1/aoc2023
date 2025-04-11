@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Aoc2023.Cli;
 
 /// <summary>

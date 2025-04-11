@@ -1,5 +1,3 @@
-using System;
-
 namespace Aoc2023
 {
     class Node
