@@ -1,92 +1,61 @@
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Aoc2023.Days;
 using Aoc2023.Input;
 
 public class Day6 : Day
 {
-    private string filepath;
-    private List<string> inputList;
-    private Dictionary<string, List<Dictionary<string, long>>> races;
+    private readonly List<Race> racesPart1;
+    private readonly List<Race> racesPart2;
+
     public Day6(string filepath)
     {
-        this.filepath = filepath;
-        InputReader fileInput = new InputReader(this.filepath);
-        this.inputList = fileInput.ReadLines();
-        this.races = this.ParseRaces();
+        var input = new InputReader(filepath).ReadLines();
+        (racesPart1, racesPart2) = ParseRaces(input);
     }
 
-    private Dictionary<string, List<Dictionary<string, long>>> ParseRaces()
+    private record Race(long Time, long Distance);
+
+    private static (List<Race> part1, List<Race> part2) ParseRaces(List<string> input)
     {
-        List<List<string>> raceInfo = [];
-        List<string> raceInfoPart2 = [];
-        Dictionary<string, List<Dictionary<string, long>>> tmpRaces = new Dictionary<string, List<Dictionary<string, long>>>();
-        tmpRaces["1"] = new List<Dictionary<string, long>>();
-        tmpRaces["2"] = new List<Dictionary<string, long>>();
+        var parts = input
+            .Select(line => line.Split(':')[1]
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            .ToList();
 
-        foreach (var input in this.inputList)
-        {
-            List<string> parts = input.Split(new[] { ":" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            var numPart = parts[1].Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            raceInfo.Add(numPart);
-            raceInfoPart2.Add(string.Join("", numPart));
-        }
+        var part1 = parts[0]
+            .Zip(parts[1], (time, distance) => new Race(long.Parse(time), long.Parse(distance)))
+            .ToList();
 
-        for (int i = 0; i < raceInfo[0].Count; i++)
-        {
-            tmpRaces["1"].Add(new Dictionary<string, long>
-            {
-                ["time"] = long.Parse(raceInfo[0][i].Trim()),
-                ["distance"] = long.Parse(raceInfo[1][i].Trim()),
-            });
-        }
-        tmpRaces["2"].Add(new Dictionary<string, long>
-        {
-            ["time"] = long.Parse(raceInfoPart2[0].Trim()),
-            ["distance"] = long.Parse(raceInfoPart2[1].Trim()),
-        });
+        var time2 = long.Parse(string.Concat(parts[0]));
+        var distance2 = long.Parse(string.Concat(parts[1]));
+        var part2 = new List<Race> { new(time2, distance2) };
 
-        return tmpRaces;
-
+        return (part1, part2);
     }
 
-    private (double, double) SolveRace(long a, long b, long c)
+    private static (double Lower, double Upper) SolveRace(long time, long distance)
     {
-        var det1 = Math.Sqrt(b * b - (4 * a * c));
-        var det2 = 2 * a;
-        var root1 = (-1 * b + det1) / det2;
-        var root2 = (-1 * b - det1) / det2;
-
+        double a = 1, b = -time, c = distance + 1;
+        double discriminant = Math.Sqrt(b * b - 4 * a * c);
+        double root1 = (-b + discriminant) / (2 * a);
+        double root2 = (-b - discriminant) / (2 * a);
         return (Math.Floor(root1), Math.Ceiling(root2));
     }
 
 
-    string Day.Part1()
+    private static string Solve(IEnumerable<Race> races)
     {
-        double ans = 1;
-        foreach (var race in this.races["1"])
+        double result = 1;
+        foreach (var race in races)
         {
-            var a = 1;
-            var b = -1 * race["time"];
-            var c = race["distance"] + 1;
-            var (root1, root2) = SolveRace(a, b, c);
-            ans = ans * (Math.Abs(root1 - root2) + 1);
+            var (low, high) = SolveRace(race.Time, race.Distance);
+            result *= Math.Abs(high - low) + 1;
         }
-        return ans.ToString();
+        return result.ToString();
     }
 
-    string Day.Part2()
-    {
-        double ans = 1;
-        foreach (var race in this.races["2"])
-        {
-            var a = 1;
-            var b = -1 * race["time"];
-            var c = race["distance"] + 1;
-            var (root1, root2) = SolveRace(a, b, c);
-            ans = ans * (Math.Abs(root1 - root2) + 1);
-        }
-        return ans.ToString();
-
-    }
+    string Day.Part1() => Solve(racesPart1);
+    string Day.Part2() => Solve(racesPart2);
 
 }
