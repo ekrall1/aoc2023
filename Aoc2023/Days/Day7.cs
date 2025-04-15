@@ -1,12 +1,13 @@
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 using Aoc2023.Days;
 using Aoc2023.Input;
 
 public class Day7 : Day
 {
-    private readonly IEnumerable<Hand> handsPart1;
-    private readonly Dictionary<char, int> cardOrder;
+    private readonly IEnumerable<Hand> puzzleHands;
+    private Dictionary<char, int> cardOrder;
     private Dictionary<string, HandValue> handValues;
 
     public Day7(string filepath)
@@ -27,7 +28,7 @@ public class Day7 : Day
             { '2', 3 },
         };
         var input = new InputReader(filepath).ReadLines();
-        handsPart1 = ParseHands(input);
+        puzzleHands = ParseHands(input);
         handValues = new Dictionary<string, HandValue>();
     }
 
@@ -47,69 +48,79 @@ public class Day7 : Day
         return parts;
     }
 
-    private HandValue ScoreHand(Hand hand)
+    private int ScoreUniqueCards(int uniqueCards, Dictionary<char, int> handCounter, Hand hand, int part)
+    {
+        if (part == 1)
+        {
+            return uniqueCards switch
+            {
+                1 => 7,
+                2 => handCounter.ContainsValue(4) ? 6 : 5,
+                3 => handCounter.ContainsValue(3) ? 4 : 3,
+                4 => 2,
+                5 => 1,
+                _ => throw new InvalidOperationException($"This hand cannot be scored {hand.Cards}")
+            };
+        }
+        else
+        {
+            var jokers = handCounter.GetValueOrDefault('J');
+            if (jokers == 5)
+            {
+                return 7;  // all jokers five of a kind
+            }
+            handCounter.Remove('J');
+            int maxVal = handCounter.Values.Max();
+
+            return (maxVal + jokers) switch
+            {
+                5 => 7,
+                4 => 6, // four of a kind
+                3 => handCounter.Count == 2 ? 5 : 4, // full house or three of a kind // ABBJC
+                2 => handCounter.Values.Count(v => v == 2) == 2 || handCounter.Values.Count(v => v == 2) == 1 && jokers == 1 ? 3 : 2, // two pairs or one pair
+                1 => 1,
+                _ => throw new InvalidOperationException($"This hand cannot be scored {hand.Cards}")
+            };
+
+        }
+    }
+
+    private HandValue ScoreHand(Hand hand, int part)
     {
         var cardArray = hand.Cards.ToCharArray();
         if (cardArray.Length != 5)
-        {
             throw new Exception($"{hand} is an invalid hand");
-        }
 
         Dictionary<char, int> handCounter = new Dictionary<char, int>();
-
-        var highCardScore = 1;
+        int highCardScore = 1;
+        const int baseValue = 20;
 
         foreach (var card in cardArray)
         {
             handCounter[card] = handCounter.GetValueOrDefault(card, 0) + 1;
-            highCardScore = highCardScore * 20 + cardOrder[card];
+            highCardScore = highCardScore * baseValue + cardOrder[card];
         }
 
-        var handScore = 0;
-        var handLength = handCounter.Keys.Count();
+        int uniqueCards = handCounter.Count();
 
-        switch (handLength)
-        {
-            case 1:  // five of a kind
-                handScore = 7;
-                break;
-            case 2:
-                if (handCounter.ContainsValue(4))
-                { // four of a kind
-                    handScore = 6;
-                }
-                else
-                {
-                    handScore = 5; // full house
-                }
-                break;
-            case 3:
-                if (handCounter.ContainsValue(3))
-                { // three of a kind
-                    handScore = 4;
-                }
-                else
-                {
-                    handScore = 3; // two pair
-                }
-                break;
-            case 4:
-                handScore = 2; // one pair
-                break;
-            case 5:
-                handScore = 1;
-                break;
-        }
+        int handScore = ScoreUniqueCards(uniqueCards, handCounter, hand, part);
+
         return new HandValue(handScore, highCardScore, hand.Wager);
     }
 
-    private string Solve(IEnumerable<Hand> hands)
+    private string Solve(IEnumerable<Hand> hands, int part)
     {
+
+        if (part == 2)
+        {
+            cardOrder['J'] = 1;
+        }
+
         foreach (Hand hand in hands)
         {
             if (!handValues.ContainsKey(hand.Cards))
             {
-                handValues[hand.Cards] = ScoreHand(hand);
+                handValues[hand.Cards] = ScoreHand(hand, part);
             };
 
         }
@@ -123,7 +134,7 @@ public class Day7 : Day
 
     }
 
-    string Day.Part1() => Solve(handsPart1);
-    string Day.Part2() => Solve(handsPart1);
+    string Day.Part1() => Solve(puzzleHands, 1);
+    string Day.Part2() => Solve(puzzleHands, 2);
 
 }
