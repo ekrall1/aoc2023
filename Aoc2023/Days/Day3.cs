@@ -22,7 +22,7 @@ public class Day3 : Day
 
     private Grid MakeGrid()
     {
-        var grid = new Grid();
+        var grid = new Grid(dxdy: [(0, 1), (1, 0), (-1, 0), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1)]);
         grid.Create(this._inputList);
         return grid;
     }

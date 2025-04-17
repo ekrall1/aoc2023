@@ -311,4 +311,42 @@ public class UnitTestDays
         var output = writer.ToString().Trim();
         Assert.Equal("part 2 solution is: 2", output);
     }
+
+    [Fact]
+    public void Test_Day10_Part1a()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day10a.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "10", "1"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 1 solution is: 4", output);
+    }
+
+    [Fact]
+    public void Test_Day10_Part1b()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day10b.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "10", "1"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 1 solution is: 8", output);
+    }
 }

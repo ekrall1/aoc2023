@@ -6,11 +6,13 @@ namespace Aoc2023
         public Dictionary<(int, int), char> gridMap;
         public int rows;
         public List<int> cols;
-        public Grid()
+        public (int, int)[] dxdy;  // directions
+        public Grid((int, int)[] dxdy)
         {
             this.rows = 0;
             this.cols = [];
             this.gridMap = new Dictionary<(int, int), char> { };
+            this.dxdy = dxdy;
         }
 
         public void Create(List<string> input)
@@ -32,7 +34,6 @@ namespace Aoc2023
 
         public List<char> NeighborsOfChar((int, int) loc)
         {
-            (int, int)[] dxdy = [(0, 1), (1, 0), (-1, 0), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1)];
             List<char> neighbors = [];
 
             for (int i = 0; i < dxdy.Length; i++)
@@ -57,7 +58,6 @@ namespace Aoc2023
         }
         public List<(int, int)> NeighborsOfCoord((int, int) loc)
         {
-            (int, int)[] dxdy = [(0, 1), (1, 0), (-1, 0), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1)];
             List<(int, int)> neighbors = [];
 
             for (int i = 0; i < dxdy.Length; i++)
