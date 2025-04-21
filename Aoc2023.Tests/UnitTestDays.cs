@@ -349,4 +349,156 @@ public class UnitTestDays
         var output = writer.ToString().Trim();
         Assert.Equal("part 1 solution is: 8", output);
     }
+
+    [Fact]
+    public void Test_Day10_Part1c()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day10c.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "10", "1"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 1 solution is: 23", output);
+    }
+
+    [Fact]
+    public void Test_Day10_Part1d()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day10d.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "10", "1"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 1 solution is: 70", output);
+    }
+
+    [Fact]
+    public void Test_Day10_Part1e()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day10e.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "10", "1"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 1 solution is: 80", output);
+    }
+
+    [Fact]
+    public void Test_Day10_Part2a()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day10a.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "10", "2"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 2 solution is: 1", output);
+    }
+
+    [Fact]
+    public void Test_Day10_Part2b()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day10b.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "10", "2"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 2 solution is: 1", output);
+    }
+
+    [Fact]
+    public void Test_Day10_Part2c()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day10c.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "10", "2"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 2 solution is: 4", output);
+    }
+
+    [Fact]
+    public void Test_Day10_Part2d()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day10d.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "10", "2"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 2 solution is: 8", output);
+    }
+
+    [Fact]
+    public void Test_Day10_Part2e()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day10e.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "10", "2"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 2 solution is: 10", output);
+    }
 }
