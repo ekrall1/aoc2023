@@ -71,51 +71,55 @@ public class Day12 : Day
     private static long Part2Solver(List<char> springs, List<int> counts, List<char> acc)
     {
 
-        string key = string.Join(",", springs) + string.Join(",", counts) + string.Join("", acc);
+        string key = string.Join(",", springs) + "|" + string.Join(",", counts) + "|" + string.Concat(acc);
 
         if (memo.TryGetValue(key, out long cachedVal))
         {
             return cachedVal;
         }
 
+        long res = 0;
         if (springs.Count == 0)
         {
-            // exhausted all counts or only one count left and it is equal to the accumulated #s
             if (acc.Count > 0)
             {
-                return (counts.Count == 1 && acc.Count == counts[0]) ? 1 : 0;
+                if (counts.Count == 1 && acc.Count == counts[0])
+                    res = 1;
             }
-            return (counts.Count == 0) ? 1 : 0;
+            else if (counts.Count == 0)
+            {
+                res = 1;
+            }
         }
-
-        var hd = springs[0];
-        var tl = springs.Skip(1).ToList();
-
-        var checks = hd == '?' ? new[] { '.', '#' } : new[] { hd };
-        long res = 0;
-        foreach (char c in checks)
+        else
         {
-            if (c == '#')
+            var hd = springs[0];
+            var tl = springs.Skip(1).ToList();
+            var checks = hd == '?' ? new[] { '.', '#' } : new[] { hd };
+
+            foreach (char c in checks)
             {
-                var newAcc = new List<char>(acc) { c };
-                res += Part2Solver(tl, counts, newAcc);
-            }
-            else  // if it's not a #, start a new accumulator
-            {
-                if (acc.Count > 0)
+                if (c == '#')
                 {
-                    // If a group just ended and it's a 'fit'
-                    if (counts.Count > 0 && acc.Count == counts[0])
+                    var newAcc = new List<char>(acc) { c };
+                    res += Part2Solver(tl, counts, newAcc);
+                }
+                else  // if it's not a #, start a new accumulator
+                {
+                    if (acc.Count > 0)
                     {
-                        res += Part2Solver(tl, counts.Skip(1).ToList(), new List<char>());
+                        // If a group just ended and it's a 'fit'
+                        if (counts.Count > 0 && acc.Count == counts[0])
+                        {
+                            res += Part2Solver(tl, counts.Skip(1).ToList(), new List<char>());
+                        }
+                    }
+                    else
+                    {
+                        res += Part2Solver(tl, counts, new List<char>());
                     }
                 }
-                else
-                {
-                    res += Part2Solver(tl, counts, new List<char>());
-                }
             }
-
         }
         memo[key] = res;
         return res;
