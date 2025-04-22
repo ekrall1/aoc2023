@@ -13,38 +13,41 @@ using Aoc2023.Utils;
 
 public class Day11 : Day
 {
+    readonly private List<string> rawInput;
     private List<string> input;
     private readonly Grid grid;
+    private List<((int, int), (int, int))> pairs;
 
     public Day11(string filepath)
     {
-        this.input = new InputReader(filepath).ReadLines();
-        this.ExpandInput();
+        rawInput = new InputReader(filepath).ReadLines();
+        (this.input, this.pairs) = this.ExpandInput(rawInput);
         this.grid = new Grid(dxdy: [(0, 1), (0, -1), (1, 0), (-1, 0)]);
         this.grid.Create(input);
     }
 
-    private void ExpandInput()
+    private (List<string>, List<((int, int), (int, int))>) ExpandInput(List<string> originalInput)
     {
         List<string> newInput = [];
 
         // rows
-        for (int r = 0; r < this.input.Count; r++)
+        for (int r = 0; r < originalInput.Count; r++)
         {
-            newInput.Add(this.input[r]);
-            if (this.input[r].ToHashSet<char>().Count == 1) {
-                newInput.Add(this.input[r]);
+            newInput.Add(originalInput[r]);
+            if (originalInput[r].ToHashSet<char>().Count == 1)
+            {
+                newInput.Add(originalInput[r]);
             }
         }
 
         // cols
         int addedCols = 0;
-        for (int c = 0; c < this.input[0].Count(); c++)
+        for (int c = 0; c < originalInput.Count(); c++)
         {
             string column = "";
-            for (int r = 0; r < this.input.Count; r++)
+            for (int r = 0; r < originalInput.Count; r++)
             {
-                column += this.input[r][c];
+                column += originalInput[r][c];
             }
             if (column.ToHashSet<char>().Count == 1)
             {
@@ -59,9 +62,10 @@ public class Day11 : Day
             }
         }
 
-        // convert galaxies to numbers
+        // convert galaxies to numbers and collect pairs
         int ctr = 1;
         List<char[]> mutNewInput = newInput.Select(row => row.ToCharArray()).ToList();
+        List<(int, int)> points = new List<(int, int)>();
 
         for (int r = 0; r < mutNewInput.Count; r++)
         {
@@ -71,20 +75,37 @@ public class Day11 : Day
                 {
                     mutNewInput[r][c] = (char)(ctr + '0');
                     ctr++;
+                    points.Add((r, c));
                 }
             }
         }
 
-        this.input = mutNewInput.Select(row => new String(row)).ToList();
+        return (mutNewInput.Select(row => new String(row)).ToList(), GetAllPairs(points));
+    }
+
+    static List<((int, int), (int, int))> GetAllPairs(List<(int, int)> list)
+    {
+        var result = new List<((int, int), (int, int))>();
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            for (int j = i + 1; j < list.Count; j++)
+            {
+                result.Add((list[i], list[j]));
+            }
+        }
+
+        return result;
     }
 
     private string Solve(int part)
     {
-        for (int r = 0; r < this.input.Count(); r++)
+        int totalSum = 0;
+        foreach (((int, int), (int, int)) pair in this.pairs)
         {
-            Console.WriteLine(this.input[r]);
+            totalSum += Distance.Manhattan(pair.Item1, pair.Item2);
         }
-        return "";
+        return totalSum.ToString();
 
     }
 
