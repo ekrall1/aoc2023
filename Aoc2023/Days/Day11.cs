@@ -13,35 +13,51 @@ using Aoc2023.Utils;
 
 public class Day11 : Day
 {
-    readonly private List<string> rawInput;
-    private List<string> input;
-    private readonly Grid grid;
-    private List<((int, int), (int, int))> pairs;
+    private List<string> rawInput;
 
     public Day11(string filepath)
     {
-        rawInput = new InputReader(filepath).ReadLines();
-        (this.input, this.pairs) = this.ExpandInput(rawInput);
-        this.grid = new Grid(dxdy: [(0, 1), (0, -1), (1, 0), (-1, 0)]);
-        this.grid.Create(input);
+        this.rawInput = new InputReader(filepath).ReadLines();
     }
 
-    private (List<string>, List<((int, int), (int, int))>) ExpandInput(List<string> originalInput)
+    private List<((int, int), (int, int))> ExpandInput(List<string> input, int part)
     {
-        List<string> newInput = [];
+        int factor = part == 1 ? 2 : 1_000_000;
+        List<char[]> originalInput = input.Select(row => row.ToCharArray()).ToList();
 
-        // rows
+        List<(int, int)> points = new List<(int, int)>();
+
         for (int r = 0; r < originalInput.Count; r++)
         {
-            newInput.Add(originalInput[r]);
+            for (int c = 0; c < originalInput[r].Count(); c++)
+            {
+                if (originalInput[r][c] == '#')
+                {
+                    points.Add((r, c));
+                }
+            }
+        }
+
+        // rows
+        int rowsAdded = 0;
+        for (int r = 0; r < originalInput.Count; r++)
+        {
             if (originalInput[r].ToHashSet<char>().Count == 1)
             {
-                newInput.Add(originalInput[r]);
+                points = points.Select(point =>
+                {
+                    if (point.Item1 >= r + rowsAdded)
+                    {
+                        point.Item1 += factor - 1;
+                    }
+                    return point;
+                }).ToList();
+                rowsAdded += factor - 1;
             }
         }
 
         // cols
-        int addedCols = 0;
+        int colsAdded = 0;
         for (int c = 0; c < originalInput.Count(); c++)
         {
             string column = "";
@@ -51,36 +67,19 @@ public class Day11 : Day
             }
             if (column.ToHashSet<char>().Count == 1)
             {
-                for (int r = 0; r < newInput.Count; r++)
+                points = points.Select(point =>
                 {
-                    var tmpRemaining = newInput[r][(c + addedCols + 1)..];
-                    newInput[r] = newInput[r][0..(c + addedCols + 1)];
-                    newInput[r] += '.';
-                    newInput[r] += tmpRemaining;
-                }
-                addedCols++;
+                    if (point.Item2 >= c + colsAdded)
+                    {
+                        point.Item2 += factor - 1;
+                    }
+                    return point;
+                }).ToList();
+                colsAdded += factor - 1;
             }
         }
 
-        // convert galaxies to numbers and collect pairs
-        int ctr = 1;
-        List<char[]> mutNewInput = newInput.Select(row => row.ToCharArray()).ToList();
-        List<(int, int)> points = new List<(int, int)>();
-
-        for (int r = 0; r < mutNewInput.Count; r++)
-        {
-            for (int c = 0; c < mutNewInput[r].Count(); c++)
-            {
-                if (mutNewInput[r][c] == '#')
-                {
-                    mutNewInput[r][c] = (char)(ctr + '0');
-                    ctr++;
-                    points.Add((r, c));
-                }
-            }
-        }
-
-        return (mutNewInput.Select(row => new String(row)).ToList(), GetAllPairs(points));
+        return GetAllPairs(points);
     }
 
     static List<((int, int), (int, int))> GetAllPairs(List<(int, int)> list)
@@ -100,11 +99,14 @@ public class Day11 : Day
 
     private string Solve(int part)
     {
-        int totalSum = 0;
-        foreach (((int, int), (int, int)) pair in this.pairs)
+        var pairs = this.ExpandInput(this.rawInput, part);
+        long totalSum = 0;
+        foreach (((int, int), (int, int)) pair in pairs)
         {
             totalSum += Distance.Manhattan(pair.Item1, pair.Item2);
         }
+
+
         return totalSum.ToString();
 
     }

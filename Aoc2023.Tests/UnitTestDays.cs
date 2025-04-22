@@ -501,4 +501,42 @@ public class UnitTestDays
         var output = writer.ToString().Trim();
         Assert.Equal("part 2 solution is: 10", output);
     }
+
+    [Fact]
+    public void Test_Day11_Part1()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day11.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "11", "1"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 1 solution is: 374", output);
+    }
+
+    [Fact]
+    public void Test_Day11_Part2()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day11.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "11", "2"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 2 solution is: 82000210", output);
+    }
 }
