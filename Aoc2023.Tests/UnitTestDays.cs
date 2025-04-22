@@ -539,4 +539,23 @@ public class UnitTestDays
         var output = writer.ToString().Trim();
         Assert.Equal("part 2 solution is: 82000210", output);
     }
+
+    [Fact]
+    public void Test_Day12_Part1()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day12.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "12", "1"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 1 solution is: 21", output);
+    }
 }
