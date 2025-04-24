@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using Aoc2023.Days;
 using Aoc2023.Input;
 

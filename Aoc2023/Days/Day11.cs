@@ -1,15 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using Aoc2023;
 using Aoc2023.Days;
 using Aoc2023.Input;
-using Aoc2023.Utils;
 
 public class Day11 : Day
 {
