@@ -1,128 +1,131 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Metrics;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using Aoc2023;
 using Aoc2023.Days;
 using Aoc2023.Input;
-using Aoc2023.Utils;
 
 public class Day13 : Day
 {
     private List<string> input;
     private List<List<string>> puzzlePatterns;
+    private List<List<string>> transpose;
 
     public Day13(string filepath)
     {
         this.input = new InputReader(filepath).ReadLines();
-
-        List<string> tmp = [];
         this.puzzlePatterns = [];
+        this.transpose = [];
 
-        this.input.Add("");
-        foreach (var line in this.input)
-        {
-            if (line == "")
-            {
-                if (tmp.Count > 0)
+        var tmp = this.input
+            .Aggregate(
+                new List<List<string>> { new List<string>() },
+                (acc, line) =>
                 {
-                    this.puzzlePatterns.Add(tmp);
-                }
-                tmp = [];
-            }
-            else
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        acc.Add(new List<string>());
+                    }
+                    else
+                    {
+                        acc.Last().Add(line);
+                    }
+                    return acc;
+                });
+
+        foreach (var puzz in tmp)
+        {
+            if (puzz.Count > 0)
             {
-                tmp.Add(line);
+                this.puzzlePatterns.Add(puzz);
+                this.transpose.Add(GetPuzzleTranspose(puzz));
             }
         }
     }
     private record RowSymmetry(bool hasSymmetry, int i, int j);
     private record ColSymmetry(bool hasSymmetry, int i, int j);
 
-    private static RowSymmetry CheckRows(List<string> puzzle)
+    private List<string> GetPuzzleTranspose(List<string> puzz)
     {
-        var rowSymmetry = false;
-        int j = 0;
-        for (int i = 0; i < puzzle.Count - 1; i++)
-        {
-            j = i + 1;
-            var top = puzzle[i];
-            var bottom = puzzle[j];
+        if (puzz == null || puzz.Count == 0)
+            return [];
 
-            if (top == bottom)
-            {
-                int m = i;
-                int n = j;
-                while (m >= 0 && n < puzzle.Count)
-                {
-                    rowSymmetry = puzzle[m] == puzzle[n];
-                    if (!rowSymmetry)
-                        break;
-                    m--;
-                    n++;
-                }
-                if (rowSymmetry)
-                    return new RowSymmetry(rowSymmetry, i, j);
-            }
-        }
-        return new RowSymmetry(rowSymmetry, -1, -1);
+        return Enumerable.Range(0, puzz[0].Length)
+            .Select(col => new string(puzz.Select(row => row[col]).ToArray()))
+            .ToList();
     }
 
-    private static ColSymmetry CheckCols(List<string> puzzle)
+    public static int HammingDistance(string a, string b)
     {
-        var colSymmetry = false;
-        int j = 0;
-        for (int i = 0; i < puzzle[0].Length - 1; i++)
+        if (a.Length != b.Length)
         {
-            j = i + 1;
-            var left = puzzle.Select(r => r[i]).ToList();
-            var right = puzzle.Select(r => r[j]).ToList();
+            throw new ArgumentException("Strings must be of the same length");
+        }
 
-            if (left.SequenceEqual(right))
+        return a.Zip(b, (char1, char2) => char1 != char2 ? 1 : 0).Sum();
+    }
+
+    private static RowSymmetry CheckRows(List<string> puzzle, int allowedDist, RowSymmetry? ignore = null)
+    {
+        RowSymmetry result = new RowSymmetry(false, -1, -1);
+
+        for (int i = 0; i < puzzle.Count - 1; i++)
+        {
+            int j = i + 1;
+
+            int mismatch = HammingDistance(puzzle[i], puzzle[j]);
+            if (mismatch > allowedDist)
+                continue;
+
+            bool symmetric = true;
+            for (int m = i - 1, n = j + 1; m >= 0 && n < puzzle.Count; m--, n++)
             {
-                int m = i;
-                int n = j;
-                while (m >= 0 && n < puzzle[0].Length)
+                int curDist = HammingDistance(puzzle[m], puzzle[n]);
+
+                mismatch += curDist;
+                if (mismatch > allowedDist)
                 {
-                    var _left = puzzle.Select(r => r[m]).ToList();
-                    var _right = puzzle.Select(r => r[n]).ToList();
-                    colSymmetry = _left.SequenceEqual(_right);
-                    if (!colSymmetry)
-                        break;
-                    m--;
-                    n++;
+                    symmetric = false;
+                    break;
                 }
-                if (colSymmetry)
-                    return new ColSymmetry(colSymmetry, i, j);
             }
 
-        }
-        return new ColSymmetry(colSymmetry, -1, -1);
+            if (symmetric && mismatch == allowedDist)
+            {
+                if (ignore is null || !(ignore.i == i )) // catch - part 1 result must be ignored
+                {
+                    result = new RowSymmetry(true, i, j);
+                    break;
+                }
 
+            }
+        }
+        return result;
     }
 
     private string Solve(int part)
     {
-        int score = 0;
-        foreach (var puzzle in this.puzzlePatterns)
+        var score = 0;
+
+        for (int idx = 0; idx < this.puzzlePatterns.Count; idx++)
         {
-            var rowSymmetry = CheckRows(puzzle);
-            score += 100 * (rowSymmetry.hasSymmetry ? rowSymmetry.i + 1 : 0);
+            var pattern = this.puzzlePatterns[idx];
+            var transposed = this.transpose[idx];
 
-            if (rowSymmetry.hasSymmetry)
+            var rowSymPart1 = CheckRows(pattern, 0);
+            var colSymPart1 = CheckRows(transposed, 0);
+
+            if (part == 1)
             {
-                continue;
+                score += rowSymPart1.hasSymmetry
+                    ? 100 * (rowSymPart1.i + 1)
+                    : (colSymPart1.i + 1);
             }
+            else
+            {
+                var rowSymPart2 = CheckRows(pattern, 1, rowSymPart1);
+                var colSymPart2 = CheckRows(transposed, 1, colSymPart1);
 
-            var colSymmetry = CheckCols(puzzle);
-            score += 1 * (colSymmetry.hasSymmetry ? colSymmetry.i + 1 : 0);
+                score += rowSymPart2.hasSymmetry
+                    ? 100 * (rowSymPart2.i + 1)
+                    : (colSymPart2.i + 1);
+            }
         }
         return score.ToString();
     }
