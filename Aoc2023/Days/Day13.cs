@@ -88,7 +88,7 @@ public class Day13 : Day
 
             if (symmetric && mismatch == allowedDist)
             {
-                if (ignore is null || !(ignore.i == i )) // catch - part 1 result must be ignored
+                if (ignore is null || !(ignore.i == i)) // catch - part 1 result must be ignored
                 {
                     result = new RowSymmetry(true, i, j);
                     break;
