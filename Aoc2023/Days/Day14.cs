@@ -95,10 +95,10 @@ public class Day14 : Day
             while (cycleDetected < 0)
             {
                 data = TiltEast(TiltSouth(TiltWest(TiltNorth(data))));
-                var hash = InputHash.GetListHash(data);
-                hashes.Add(hash);
                 rocksCache[ctr] = data;
                 ctr++;
+                var hash = InputHash.GetListHash(data);
+                hashes.Add(hash);
                 cycleDetected = Cycles.FloydsCycleDetection(hashes);
             }
             Cycles.Cycle cycle = Cycles.FloydsCycleStartLength(hashes, cycleDetected);
