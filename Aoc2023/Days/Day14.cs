@@ -1,10 +1,7 @@
 using System.Data;
-using System.Text;
 using Aoc2023;
 using Aoc2023.Days;
 using Aoc2023.Input;
-using Aoc2023.Utils;
-using Microsoft.VisualBasic;
 
 public class Day14 : Day
 {
