@@ -617,7 +617,7 @@ public class UnitTestDays
     }
 
     [Fact]
-    public void Test_Day14_Part2()
+    public void Test_Day14_Part1()
     {
         // Arrange
         var writer = new StringWriter();
@@ -633,5 +633,24 @@ public class UnitTestDays
         // Assert
         var output = writer.ToString().Trim();
         Assert.Equal("part 1 solution is: 136", output);
+    }
+
+    [Fact]
+    public void Test_Day14_Part2()
+    {
+        // Arrange
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        var invkr = new Invoker();
+        var rcvr = new RunDayReceiver();
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "./TestInput/Day14.txt");
+
+        // Act
+        invkr.Setup(new RunDay(rcvr, filePath, "14", "2"));
+        invkr.DoAocDay();
+
+        // Assert
+        var output = writer.ToString().Trim();
+        Assert.Equal("part 2 solution is: 64", output);
     }
 }

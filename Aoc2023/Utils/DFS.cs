@@ -17,6 +17,7 @@ namespace Aoc2023
             _FilterFunc = puzzleDay switch
             {
                 "Day10" => Day10Filter,
+                "Day14" => Day14Filter,
                 _ => DefaultFilter
             };
         }
@@ -74,6 +75,15 @@ namespace Aoc2023
                 };
                 return nxt;
             }).ToList();
+
+            return nextNeighbor;
+        }
+
+        public List<(int, int)> Day14Filter((int, int) cur, List<(int, int)> neighbors)
+        {
+            var currentChar = _Grid.gridMap[cur];
+
+            List<(int, int)> nextNeighbor = [.. neighbors.Where(neighbor => _Grid.gridMap[neighbor] == 'O')];
 
             return nextNeighbor;
         }
