@@ -91,4 +91,8 @@ namespace Aoc2023
         public List<(int, int)> DefaultFilter((int, int) cur, List<(int, int)> neighbors) { return []; }
 
     }
+    public class AocGridDFSWithDirection
+    {
+
+    }
 }
