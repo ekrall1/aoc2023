@@ -80,6 +80,22 @@ namespace Aoc2023
 
             return neighbors;
         }
+
+        public List<(int, int, (int, int))> NeighborsOfCoordWithDirection((int, int, (int, int)) loc)
+        {
+            List<(int, int, (int, int))> neighbors = [];
+
+            int dx = loc.Item1 + loc.Item3.Item1;
+            int dy = loc.Item2 + loc.Item3.Item2;
+
+            if (dx < 0 || dy < 0 || dx >= this.rows || dy >= this.cols[dx])
+            {
+                return [];
+            }
+
+            neighbors.Add((dx, dy, (loc.Item3.Item1, loc.Item3.Item2)));
+            return neighbors;
+        }
     }
 
 
