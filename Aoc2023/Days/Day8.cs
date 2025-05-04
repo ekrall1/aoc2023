@@ -90,7 +90,8 @@ public class Day8 : Day
                 {
                     cycles.Add(ctr);
                     break;
-                };
+                }
+                ;
 
                 char inst = instructions[charCtr];
                 if (inst == 'R' && tmpNode?.Right != null)

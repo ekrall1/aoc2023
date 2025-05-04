@@ -118,7 +118,8 @@ public class Day7 : Day
             if (!handValues.ContainsKey(hand.Cards))
             {
                 handValues[hand.Cards] = ScoreHand(hand, part);
-            };
+            }
+            ;
 
         }
 

@@ -105,49 +105,66 @@ namespace Aoc2023
             _FilterFunc = DefaultFilter;
         }
 
-        public List<CoordWithDirection> DefaultFilter(CoordWithDirection cur, List<CoordWithDirection> neighbors)
+        public List<CoordWithDirection> GetRotations(CoordWithDirection cur)
         {
-            var neighborChar = _Grid.gridMap[(neighbors[0].Item1, neighbors[0].Item2)];
-            if (neighborChar == '.')
-                return neighbors;
+            var gridChar = _Grid.gridMap[(cur.Item1, cur.Item2)];
+            var nxtDirections = new List<CoordWithDirection>();
 
-            var updatedNeighbors = new List<CoordWithDirection>();
-
-            switch (neighborChar)
+            switch (gridChar)
             {
                 case '\\':
-                    // Rotate clockwise
-                    updatedNeighbors.Add(RotateClockwise(neighbors[0]));
+                    nxtDirections.Add(RotateClockwise(cur));
                     break;
 
                 case '/':
-                    // Rotate counter-clockwise
-                    updatedNeighbors.Add(RotateCounterClockwise(neighbors[0]));
+                    nxtDirections.Add(RotateCounterClockwise(cur));
                     break;
 
                 case '-':
                     // Split into two directions
-                    updatedNeighbors.AddRange(SplitDirection(neighbors[0], (0, 1), (0, -1)));
+                    if (cur.Item3 is (not 0, 0) and (int dy, 0))
+                        nxtDirections.AddRange(SplitDirection(cur, (0, 1), (0, -1)));
+                    else
+                        nxtDirections.Add(cur); // continue straight
                     break;
 
                 case '|':
                     // Split into two directions
-                    updatedNeighbors.AddRange(SplitDirection(neighbors[0], (1, 0), (-1, 0)));
+                    if (cur.Item3 is (0, int dx))
+                        nxtDirections.AddRange(SplitDirection(cur, (1, 0), (-1, 0)));
+                    else
+                        nxtDirections.Add(cur);
                     break;
             }
 
-            return updatedNeighbors;
+            return nxtDirections;
+        }
+
+        public List<CoordWithDirection> DefaultFilter(CoordWithDirection cur, List<CoordWithDirection> neighbors)
+        {
+            if (neighbors.Count == 0)
+            {
+                return [];
+            }
+
+            var neighborChar = _Grid.gridMap[(neighbors[0].Item1, neighbors[0].Item2)];
+
+            if (neighborChar == '.')
+                return neighbors;
+
+            var nxtDirections = GetRotations(neighbors[0]);
+            return nxtDirections;
         }
 
         private CoordWithDirection RotateClockwise(CoordWithDirection coord)
         {
-            var rotated = (-coord.Item3.Item2, coord.Item3.Item1);
+            var rotated = (coord.Item3.Item2, coord.Item3.Item1);
             return (coord.Item1, coord.Item2, rotated);
         }
 
         private CoordWithDirection RotateCounterClockwise(CoordWithDirection coord)
         {
-            var rotated = (coord.Item3.Item2, -coord.Item3.Item1);
+            var rotated = (-coord.Item3.Item2, -coord.Item3.Item1);
             return (coord.Item1, coord.Item2, rotated);
         }
 
@@ -165,7 +182,16 @@ namespace Aoc2023
         {
             HashSet<CoordWithDirection> visited = new HashSet<CoordWithDirection>();
 
-            stack.Push(Start);
+            List<CoordWithDirection> _start =
+                _Grid.gridMap[(Start.Item1, Start.Item2)] == '.'
+                    ? [Start]
+                    : GetRotations(Start);
+
+            foreach (var coord in _start)
+            {
+                stack.Push(coord);
+            }
+
 
             while (stack.Count > 0)
             {
