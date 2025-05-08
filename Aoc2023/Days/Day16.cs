@@ -38,7 +38,7 @@ public partial class Day16 : Day
         var leftCol = Enumerable.Range(0, grid.rows - 1)
             .Select(c => SolveWithDFS(grid, (c, 0, (0, 1))));
         var rightCol = Enumerable.Range(0, grid.rows - 1)
-            .Select(c => SolveWithDFS(grid, (c, grid.cols.Count -1, (0, -1))));
+            .Select(c => SolveWithDFS(grid, (c, grid.cols.Count - 1, (0, -1))));
 
         return new[] { topRow, bottomRow, leftCol, rightCol }.SelectMany(e => e).Max().ToString();
 
