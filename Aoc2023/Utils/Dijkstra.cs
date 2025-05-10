@@ -1,46 +1,50 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Aoc2023
 {
     public class DijkstraGraph
     {
         private Dictionary<string, List<(string neighbor, int weight)>> adj = new();
+        public record struct NodeState(int X, int Y, int DX, int DY, int Steps);
 
-        public void AddEdge(string from, string to, int weight)
+        public int Dijkstra(NodeState start, Grid grid, int min, int max)
         {
-            if (!adj.ContainsKey(from)) adj[from] = new();
-            if (!adj.ContainsKey(to)) adj[to] = new();
-
-            adj[from].Add((to, weight));
-            // adj[to].Add((from, weight));
-        }
-
-        public Dictionary<string, int> Dikstra(string start)
-        {
-            Dictionary<string, int> distances = new();
-            PriorityQueue<string, int> pq = new();
-
-            foreach (var node in adj.Keys)
-                distances[node] = int.MaxValue;
+            int width = grid.cols.Count;
+            int height = grid.rows;
+            int startCost = int.Parse(grid.gridMap[(0, 0)].ToString());
+            int endCost = int.Parse(grid.gridMap[(height - 1, width - 1)].ToString());
+            HashSet<NodeState> visited = new HashSet<NodeState>();
+            Dictionary<NodeState, int> distances = new();
+            PriorityQueue<NodeState, int> pq = new();
 
             distances[start] = 0;
             pq.Enqueue(start, 0);
 
-            while (pq.Count > 0 {
-                var cur = pq.Dequeue();
+            while (pq.TryDequeue(out var state, out var cost))
+            {
+                if (state.X == height - 1 && state.Y == width - 1)
+                    return distances[state];
 
-                foreach (var (neighbor, weight) in adj[cur])
+                if (!visited.Add(state))
+                    continue;
+
+                foreach (var next in grid.NeighborsOfCoordDay17(state, min, max))
                 {
-                    int newDist = distances[cur] + weight;
-                    if (newDist < distances[neighbor])
+                    int newX = next.X;
+                    int newY = next.Y;
+
+                    int _gridInt = int.Parse(grid.gridMap[(newX, newY)].ToString());
+                    int newCost = distances[state] + _gridInt;
+                    if (!distances.TryGetValue(next, out var existingCost) || newCost < existingCost)
                     {
-                        distances[neighbor] = newDist;
-                        pq.Enqueue(neighbor, newDist);
+                        distances[next] = newCost;
+                        pq.Enqueue(next, newCost);
                     }
                 }
             }
-            return distances;
+            return -1;
         }
     }
 }
