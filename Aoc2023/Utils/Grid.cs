@@ -4,6 +4,7 @@ namespace Aoc2023
     {
 
         public Dictionary<(int, int), char> gridMap;
+        public Dictionary<(int, int), string> stringGridMap;
         public int rows;
         public List<int> cols;
         public (int, int)[] dxdy;  // directions
@@ -12,6 +13,7 @@ namespace Aoc2023
             this.rows = 0;
             this.cols = [];
             this.gridMap = new Dictionary<(int, int), char> { };
+            this.stringGridMap = new Dictionary<(int, int), string> { };
             this.dxdy = dxdy;
         }
 
