@@ -27,7 +27,7 @@ public class GridBuilder
         this.grid = new Day18Grid([(0, 1), (0, -1), (1, 0), (-1, 0)]);
     }
 
-    public GridBuilder FillGridColorMap()
+    public GridBuilder FillGridColorMap(int part)
     {
         foreach (var line in input)
         {
@@ -36,16 +36,39 @@ public class GridBuilder
             {
                 throw new InvalidOperationException($"Malformed line: '{line}'");
             }
-            var direction = parts[0].Trim().ToLower() switch
+
+            (int, int) direction;
+            int steps;
+            string color;
+
+            if (part == 1)
             {
-                "u" => (-1, 0),
-                "d" => (1, 0),
-                "l" => (0, -1),
-                "r" => (0, 1),
-                _ => throw new InvalidOperationException($"Unknown direction: {parts[0]}")
-            };
-            int steps = int.Parse(parts[1]);
-            string color = parts[2].Trim('(', ')');
+                direction = parts[0].Trim().ToLower() switch
+                {
+                    "u" => (-1, 0),
+                    "d" => (1, 0),
+                    "l" => (0, -1),
+                    "r" => (0, 1),
+                    _ => throw new InvalidOperationException($"Unknown direction: {parts[0]}")
+                };
+                steps = int.Parse(parts[1]);
+                color = parts[2].Trim('(', ')');
+            }
+            else
+            {
+                string hex = parts[2].Trim('(', ')', '#');
+                steps = Convert.ToInt32(hex[..5], 16);
+                direction = hex[5] switch
+                {
+                    '0' => (0, 1),
+                    '1' => (1, 0),
+                    '2' => (0, -1),
+                    '3' => (-1, 0),
+                    _ => throw new InvalidOperationException($"Unknown direction from hex: {hex}")
+                };
+                color = hex;
+            }
+
             var start = coord;
             for (int i = 0; i < steps; i++)
             {
@@ -77,48 +100,37 @@ public class GridBuilder
 public partial class Day18 : Day
 {
     private List<string> input;
-    private Day18Grid grid;
 
 
     public Day18(string filepath)
     {
         this.input = new InputReader(filepath).ReadLines();
-        this.grid = new GridBuilder(input)
-                        .FillGridColorMap()
-                        .FinalizeDimensions()
-                        .Build();
     }
 
     private string Solve(int part)
     {
-        int dugOut = 0;
+        Day18Grid grid = new GridBuilder(input)
+            .FillGridColorMap(part)
+            .FinalizeDimensions()
+            .Build();
 
-        for (int row = grid.uniqueRows.Min(); row <= grid.uniqueRows.Max(); row++)
+        long dugOut = 0;
+        long area = 0;
+        long perimeter = 0;
+
+        foreach (var ((r1, c1), (r2, c2)) in grid.edges)
         {
-            for (int col = grid.uniqueCols.Min(); col <= grid.uniqueCols.Max(); col++)
-            {
-                if (grid.stringGridMap.GetValueOrDefault((row, col), "") == "")
-                {
-                    int crossings = 0;
+            // Shoelace formula part: area += x1*y2 - x2*y1
+            area += (long)c1 * (long)r2 - (long)c2 * (long)r1;
 
-                    foreach (var (start, end) in grid.edges)
-                    {
-                        int minRow = Math.Min(start.row, end.row);
-                        int maxRow = Math.Max(start.row, end.row);
-
-                        if (row >= minRow && row < maxRow && start.col > col)
-                        {
-                            crossings++;
-                        }
-
-                    }
-
-                    dugOut += crossings % 2;
-                }
-                else
-                    dugOut++;
-            }
+            // Perimeter contribution (Manhattan distance)
+            perimeter += Math.Abs(r2 - r1) + Math.Abs(c2 - c1);
         }
+
+        area = Math.Abs(area) / 2;
+
+        dugOut = area + (perimeter / 2) + 1;
+
         return dugOut.ToString();
     }
 
