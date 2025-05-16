@@ -19,6 +19,27 @@ namespace Aoc2023.Input
             return [.. File.ReadAllLines(_filepath)];
         }
 
+        public List<List<string>> ReadTwoPartLines()
+        {
+            if (!File.Exists(_filepath))
+            {
+                throw new FileNotFoundException($"file not found {_filepath}");
+            }
+
+            var parts = File.ReadAllText(_filepath)
+                            .Split(new[] { "\n\n", "\r\n\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            var part1 = parts[0].Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                                .Select(line => line.Trim())
+                                .ToList();
+
+            var part2 = parts[1].Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+                                .Select(line => line.Trim())
+                                .ToList();
+
+            return [part1, part2];
+        }
+
         public List<string> ReadToNewLines()
         {
             if (!File.Exists(_filepath))
