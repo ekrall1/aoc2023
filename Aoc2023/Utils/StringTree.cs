@@ -1,10 +1,10 @@
 namespace Aoc2023
 {
-    class StringTreeNode
+    public class StringTreeNode
     {
-        public string Name;
-        public StringTreeNode? Left;
-        public StringTreeNode? Right;
+        public string Name { get; set; }
+        public StringTreeNode? Left { get; set; }
+        public StringTreeNode? Right { get; set; }
 
         public StringTreeNode(string value)
         {

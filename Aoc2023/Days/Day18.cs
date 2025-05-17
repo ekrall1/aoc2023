@@ -1,7 +1,6 @@
 using Aoc2023;
 using Aoc2023.Days;
 using Aoc2023.Input;
-using Aoc2023.Utils;
 
 public class Day18Grid : Grid
 {
@@ -75,7 +74,7 @@ public class GridBuilder
                 coord = (coord.row + direction.Item1, coord.col + direction.Item2);
                 uniqueRows.Add(coord.row);
                 uniqueCols.Add(coord.col);
-                grid.stringGridMap[coord] = color;
+                grid.StringGridMap[coord] = color;
             }
             var end = coord;
             grid.edges.Add((start, end));
@@ -85,9 +84,9 @@ public class GridBuilder
 
     public GridBuilder FinalizeDimensions()
     {
-        grid.rows = uniqueRows.Max();
+        grid.Rows = uniqueRows.Max();
         int maxCol = uniqueCols.Max();
-        grid.cols = Enumerable.Repeat(maxCol, grid.rows + 1).ToList();
+        grid.Cols = Enumerable.Repeat(maxCol, grid.Rows + 1).ToList();
         grid.uniqueRows = uniqueRows;
         grid.uniqueCols = uniqueCols;
         return this;
@@ -99,17 +98,16 @@ public class GridBuilder
 
 public partial class Day18 : Day
 {
-    private List<string> input;
-
+    public List<string> Input { get; private set; }
 
     public Day18(string filepath)
     {
-        this.input = new InputReader(filepath).ReadLines();
+        this.Input = new InputReader(filepath).ReadLines();
     }
 
     private string Solve(int part)
     {
-        Day18Grid grid = new GridBuilder(input)
+        Day18Grid grid = new GridBuilder(Input)
             .FillGridColorMap(part)
             .FinalizeDimensions()
             .Build();

@@ -1,41 +1,35 @@
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using Aoc2023;
 using Aoc2023.Days;
 using Aoc2023.Input;
-using Aoc2023.Utils;
 
 
 public partial class Day19 : Day
 {
-    private List<List<string>> input;
-    private record Part(int x, int m, int s, int a);
+    public List<List<string>> Input { get; private set; }
+    public Dictionary<string, List<Rule>> Workflows { get; private set; }
+    public List<Part> Parts { get; private set; }
 
-    private Dictionary<string, List<Rule>> workflows;
+    public record Part(int x, int m, int s, int a);
 
-    private List<Part> parts;
-
-    private class Rule
+    public class Rule
     {
         public string? Field { get; set; }
         public int Value { get; set; }
         public char Operator { get; set; }
         public required string Next { get; set; }
         public bool IsFallback { get; set; }
-
     }
 
     public Day19(string filepath)
     {
-        this.input = new InputReader(filepath).ReadTwoPartLines();
-        this.workflows = SetupWorkflows();
-        this.parts = SetupParts();
+        this.Input = new InputReader(filepath).ReadTwoPartLines();
+        this.Workflows = SetupWorkflows();
+        this.Parts = SetupParts();
     }
 
     private List<Part> SetupParts()
     {
-        return input[1]
+        return Input[1]
            .Where(l => !string.IsNullOrWhiteSpace(l))
            .Select(line =>
            {
@@ -48,7 +42,7 @@ public partial class Day19 : Day
     private Dictionary<string, List<Rule>> SetupWorkflows()
     {
         var rulez = new Dictionary<string, List<Rule>>();
-        foreach (string line in input[0])
+        foreach (string line in Input[0])
         {
             string name = line[..line.IndexOf('{')];
             string body = line[(line.IndexOf('{') + 1)..^1];
@@ -84,10 +78,9 @@ public partial class Day19 : Day
         string current = "in";
         while (current != "A" && current != "R")
         {
-            var rules = workflows[current];
+            var rules = Workflows[current];
             foreach (var rule in rules)
             {
-                // If the rule has no condition, it's the default jump
                 if (rule.IsFallback)
                 {
                     current = rule.Next;
@@ -121,12 +114,10 @@ public partial class Day19 : Day
         return current == "A";
     }
 
-
-
     private string Solve(int part)
     {
         if (part == 1)
-            return parts
+            return Parts
                 .Where(WorkflowSucceeds)
                 .Select(part => part.x + part.m + part.a + part.s)
                 .Sum()
@@ -137,5 +128,4 @@ public partial class Day19 : Day
 
     string Day.Part1() => Solve(1);
     string Day.Part2() => Solve(2);
-
 }

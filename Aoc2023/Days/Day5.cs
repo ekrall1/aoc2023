@@ -4,27 +4,28 @@ using Aoc2023.Input;
 
 public class Day5 : Day
 {
+    public string FilePath { get; private set; }
+    public List<string> InputList { get; private set; }
+    public List<long> Seeds { get; private set; }
+    public Dictionary<string, List<MapRange>> Maps { get; private set; }
+    public List<KeyRange> SeedRanges { get; private set; }
 
-    private string _filepath;
-    private List<string> _inputList;
-    private List<long> _seeds;
-    record MapRange(long DestinationStart, long SourceStart, long Range);
-    record KeyRange(long RangeStart, long RangeLength);
-    private Dictionary<string, List<MapRange>> _maps;
-    private List<KeyRange> _seedRanges;
+    public record MapRange(long DestinationStart, long SourceStart, long Range);
+    public record KeyRange(long RangeStart, long RangeLength);
+
     public Day5(string filepath)
     {
-        this._filepath = filepath;
-        InputReader fileInput = new InputReader(this._filepath);
-        this._inputList = fileInput.ReadToNewLines();
-        this._seeds = [];
-        this._seedRanges = new List<KeyRange>();
-        this._maps = new Dictionary<string, List<MapRange>>();
+        this.FilePath = filepath;
+        InputReader fileInput = new InputReader(this.FilePath);
+        this.InputList = fileInput.ReadToNewLines();
+        this.Seeds = new List<long>();
+        this.SeedRanges = new List<KeyRange>();
+        this.Maps = new Dictionary<string, List<MapRange>>();
     }
 
     private void ParseMap(string label, string values)
     {
-        this._maps[label] = new List<MapRange>();
+        this.Maps[label] = new List<MapRange>();
         var mapLines = values
             .Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
             .Select(s => s
@@ -35,14 +36,13 @@ public class Day5 : Day
 
         foreach (var line in mapLines)
         {
-            this._maps[label].Add(new MapRange(line[0], line[1], line[2]));
+            this.Maps[label].Add(new MapRange(line[0], line[1], line[2]));
         }
     }
 
     private long GetMappedValue(string label, long input)
     {
-
-        foreach (var range in this._maps[label])
+        foreach (var range in this.Maps[label])
         {
             if (input >= range.SourceStart && input < range.SourceStart + range.Range)
             {
@@ -60,7 +60,7 @@ public class Day5 : Day
         {
             var remainingRange = new List<KeyRange> { inputRange };
 
-            foreach (var range in this._maps[label])
+            foreach (var range in this.Maps[label])
             {
                 var tmpRemaining = new List<KeyRange>();
 
@@ -83,7 +83,6 @@ public class Day5 : Day
                         {
                             tmpRemaining.Add(new KeyRange(overlapEnd, remaining.RangeStart + remaining.RangeLength - overlapEnd));
                         }
-
                     }
                     else
                     {
@@ -97,27 +96,25 @@ public class Day5 : Day
             outputList.AddRange(remainingRange);
         }
 
-
         return outputList;
     }
 
-
     string Day.Part1()
     {
-        var inputLst = string.Join(",", this._inputList);
+        var inputLst = string.Join(",", this.InputList);
         var minLocation = long.MaxValue;
 
-        this._inputList.ForEach(input =>
+        this.InputList.ForEach(input =>
         {
             string[] parts = input.Split(':');
             var label = parts[0];
             var values = parts[1];
             if (label == "seeds")
             {
-                this._seeds = values
-                .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => long.Parse(x.Trim()))
-                .ToList();
+                this.Seeds = values
+                    .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => long.Parse(x.Trim()))
+                    .ToList();
             }
             else if (label != null && values != null)
             {
@@ -125,7 +122,7 @@ public class Day5 : Day
             }
         });
 
-        this._seeds.ForEach(seed =>
+        this.Seeds.ForEach(seed =>
         {
             var soil = GetMappedValue("seed-to-soil map", seed);
             var fertilizer = GetMappedValue("soil-to-fertilizer map", soil);
@@ -135,7 +132,7 @@ public class Day5 : Day
             var humidity = GetMappedValue("temperature-to-humidity map", temp);
             var location = GetMappedValue("humidity-to-location map", humidity);
 
-            minLocation = long.Min(minLocation, location);
+            minLocation = Math.Min(minLocation, location);
         });
 
         return minLocation.ToString();
@@ -143,9 +140,9 @@ public class Day5 : Day
 
     string Day.Part2()
     {
-        var inputLst = string.Join(",", this._inputList);
+        var inputLst = string.Join(",", this.InputList);
 
-        this._inputList.ForEach(input =>
+        this.InputList.ForEach(input =>
         {
             string[] parts = input.Split(':');
             var label = parts[0];
@@ -155,7 +152,7 @@ public class Day5 : Day
                 string[] seedPairs = values.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 for (int i = 0; i < seedPairs.Length; i += 2)
                 {
-                    this._seedRanges.Add(new KeyRange(long.Parse(seedPairs[i]), long.Parse(seedPairs[i + 1])));
+                    this.SeedRanges.Add(new KeyRange(long.Parse(seedPairs[i]), long.Parse(seedPairs[i + 1])));
                 }
             }
             else if (label != null && values != null)
@@ -164,7 +161,7 @@ public class Day5 : Day
             }
         });
 
-        var soil = GetOverlappedValue("seed-to-soil map", this._seedRanges);
+        var soil = GetOverlappedValue("seed-to-soil map", this.SeedRanges);
         var fertilizer = GetOverlappedValue("soil-to-fertilizer map", soil);
         var water = GetOverlappedValue("fertilizer-to-water map", fertilizer);
         var light = GetOverlappedValue("water-to-light map", water);
@@ -173,7 +170,5 @@ public class Day5 : Day
         var location = GetOverlappedValue("humidity-to-location map", humidity);
 
         return location.Min(loc => loc.RangeStart).ToString();
-
     }
-
 }

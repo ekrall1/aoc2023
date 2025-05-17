@@ -3,16 +3,16 @@ using Aoc2023.Input;
 
 public class Day6 : Day
 {
-    private readonly List<Race> racesPart1;
-    private readonly List<Race> racesPart2;
+    public List<Race> RacesPart1 { get; private set; }
+    public List<Race> RacesPart2 { get; private set; }
 
     public Day6(string filepath)
     {
         var input = new InputReader(filepath).ReadLines();
-        (racesPart1, racesPart2) = ParseRaces(input);
+        (RacesPart1, RacesPart2) = ParseRaces(input);
     }
 
-    private record Race(long Time, long Distance);
+    public record Race(long Time, long Distance);
 
     private static (List<Race> part1, List<Race> part2) ParseRaces(List<string> input)
     {
@@ -41,7 +41,6 @@ public class Day6 : Day
         return (Math.Floor(root1), Math.Ceiling(root2));
     }
 
-
     private static string Solve(IEnumerable<Race> races)
     {
         double result = 1;
@@ -53,7 +52,6 @@ public class Day6 : Day
         return result.ToString();
     }
 
-    string Day.Part1() => Solve(racesPart1);
-    string Day.Part2() => Solve(racesPart2);
-
+    string Day.Part1() => Solve(RacesPart1);
+    string Day.Part2() => Solve(RacesPart2);
 }

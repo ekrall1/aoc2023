@@ -2,9 +2,11 @@ namespace Aoc2023
 {
     public class Cycles
     {
+        // Added properties with getters and setters
+        public required List<string> Data { get; set; }
 
         public Cycles() { }
-        public record Cycle(int start, int length);
+        public record Cycle(int Start, int Length);
 
         public static int FloydsCycleDetection(List<string> data)
         {

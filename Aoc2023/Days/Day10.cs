@@ -4,19 +4,19 @@ using Aoc2023.Input;
 
 public class Day10 : Day
 {
-    private readonly List<string> input;
-    private readonly Grid grid;
+    public List<string> Input { get; private set; }
+    public Grid Grid { get; private set; }
 
     public Day10(string filepath)
     {
-        input = new InputReader(filepath).ReadLines();
-        grid = new Grid(dxdy: [(0, 1), (0, -1), (1, 0), (-1, 0)]);
-        grid.Create(input);
+        Input = new InputReader(filepath).ReadLines();
+        Grid = new Grid(dxdy: [(0, 1), (0, -1), (1, 0), (-1, 0)]);
+        Grid.Create(Input);
     }
 
     private static (int, int) GetStartFromGrid(Grid grid)
     {
-        foreach (var (k, v) in grid.gridMap.ToList())
+        foreach (var (k, v) in grid.GridMap.ToList())
         {
             if (v == 'S') return k;
         }
@@ -25,7 +25,7 @@ public class Day10 : Day
 
     private static List<(int, int)> GetNonPathPoints(Grid grid, HashSet<(int, int)> path)
     {
-        return grid.gridMap.Select(grid => grid.Key)
+        return grid.GridMap.Select(grid => grid.Key)
              .Where(k => !path.Contains(k))
              .ToList();
     }
@@ -34,16 +34,16 @@ public class Day10 : Day
     {
         if (part == 1)
         {
-            (int, int) start = GetStartFromGrid(grid);
-            HashSet<(int, int)> path = new AocGridDFS(grid, start, "Day10").Search([]);
+            (int, int) start = GetStartFromGrid(Grid);
+            HashSet<(int, int)> path = new AocGridDFS(Grid, start, "Day10").Search([]);
             return (path.Count() / 2).ToString();
         }
         else
         {
-            (int, int) start = GetStartFromGrid(grid);
-            HashSet<(int, int)> path = new AocGridDFS(grid, start, "Day10").Search([]);
+            (int, int) start = GetStartFromGrid(Grid);
+            HashSet<(int, int)> path = new AocGridDFS(Grid, start, "Day10").Search([]);
             Polygon polygon = new Polygon(path.ToList());
-            List<(int, int)> points = GetNonPathPoints(grid, path);
+            List<(int, int)> points = GetNonPathPoints(Grid, path);
 
             int insideCount = 0;
             foreach (var point in points)
@@ -55,10 +55,8 @@ public class Day10 : Day
             }
             return insideCount.ToString();
         }
-
     }
 
     string Day.Part1() => Solve(1);
     string Day.Part2() => Solve(2);
-
 }

@@ -4,21 +4,21 @@ using Aoc2023.Input;
 
 public class Day8 : Day
 {
-    private readonly string instructions;
-    private Dictionary<string, StringTreeNode> graph;
-    private IEnumerable<StringTreeNode> part2Nodes;
-    private string rootName;
+    public string Instructions { get; private set; }
+    public Dictionary<string, StringTreeNode> Graph { get; private set; }
+    public IEnumerable<StringTreeNode> Part2Nodes { get; private set; }
+    public string RootName { get; private set; }
 
     public Day8(string filepath)
     {
         var input = new InputReader(filepath).ReadLines();
-        instructions = input[0];
-        graph = new Dictionary<string, StringTreeNode>();
-        part2Nodes = [];
+        Instructions = input[0];
+        Graph = new Dictionary<string, StringTreeNode>();
+        Part2Nodes = [];
         ParseNodes(input[1..]);
-        rootName = "AAA";
-
+        RootName = "AAA";
     }
+
     private void ParseNodes(IEnumerable<string> input)
     {
         foreach (var (row, idx) in input.Select((row, idx) => (row, idx)))
@@ -34,41 +34,41 @@ public class Day8 : Day
 
             if (parent.Name[^1] == 'A')
             {
-                part2Nodes = part2Nodes.Append(parent);
+                Part2Nodes = Part2Nodes.Append(parent);
             }
         }
     }
 
     private StringTreeNode GetOrCreateNode(string name)
     {
-        if (!graph.TryGetValue(name, out var node))
+        if (!Graph.TryGetValue(name, out var node))
         {
             node = new StringTreeNode(name);
-            graph[name] = node;
+            Graph[name] = node;
         }
         return node;
     }
 
     private string Solve()
     {
-        var node = graph[rootName];
+        var node = Graph[RootName];
         int ctr = 0;
         var charCtr = 0;
         while (true)
         {
             if (node?.Name == "ZZZ") break;
 
-            char inst = instructions[charCtr];
+            char inst = Instructions[charCtr];
             if (inst == 'R' && node?.Right != null)
             {
-                node = graph[node.Right.Name];
+                node = Graph[node.Right.Name];
             }
             if (inst == 'L' && node?.Left != null)
             {
-                node = graph[node.Left.Name];
+                node = Graph[node.Left.Name];
             }
             ctr += 1;
-            charCtr = (charCtr + 1) % instructions.Length;
+            charCtr = (charCtr + 1) % Instructions.Length;
         }
 
         return ctr.ToString();
@@ -76,7 +76,7 @@ public class Day8 : Day
 
     private string SolvePart2()
     {
-        IEnumerable<StringTreeNode> nodes = part2Nodes;
+        IEnumerable<StringTreeNode> nodes = Part2Nodes;
         List<long> cycles = [];
 
         foreach (var node in nodes)
@@ -91,19 +91,18 @@ public class Day8 : Day
                     cycles.Add(ctr);
                     break;
                 }
-                ;
 
-                char inst = instructions[charCtr];
+                char inst = Instructions[charCtr];
                 if (inst == 'R' && tmpNode?.Right != null)
                 {
-                    tmpNode = graph[tmpNode.Right.Name];
+                    tmpNode = Graph[tmpNode.Right.Name];
                 }
                 if (inst == 'L' && tmpNode?.Left != null)
                 {
-                    tmpNode = graph[tmpNode.Left.Name];
+                    tmpNode = Graph[tmpNode.Left.Name];
                 }
                 ctr += 1;
-                charCtr = (charCtr + 1) % instructions.Length;
+                charCtr = (charCtr + 1) % Instructions.Length;
             }
         }
 
@@ -128,5 +127,4 @@ public class Day8 : Day
 
     string Day.Part1() => Solve();
     string Day.Part2() => SolvePart2();
-
 }

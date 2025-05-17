@@ -2,8 +2,9 @@ namespace Aoc2023
 {
     class LLNode<T>
     {
-        public T Data;
-        public LLNode<T>? Next;
+        public T Data { get; set; }
+        public LLNode<T>? Next { get; set; }
+
         public LLNode(T value)
         {
             this.Data = value;
@@ -13,11 +14,13 @@ namespace Aoc2023
 
     class AocLinkedList<T>
     {
-        public LLNode<T>? Head;
+        public LLNode<T>? Head { get; private set; }
+
         public AocLinkedList()
         {
             this.Head = null;
         }
+
         public void Append(T value)
         {
             if (this.Head == null)
@@ -33,6 +36,7 @@ namespace Aoc2023
             }
             tmp.Next = new LLNode<T>(value);
         }
+
         public void Reverse()
         {
             if (this.Head == null)

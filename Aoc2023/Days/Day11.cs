@@ -4,11 +4,11 @@ using Aoc2023.Input;
 
 public class Day11 : Day
 {
-    private List<string> rawInput;
+    public List<string> RawInput { get; private set; }
 
     public Day11(string filepath)
     {
-        this.rawInput = new InputReader(filepath).ReadLines();
+        this.RawInput = new InputReader(filepath).ReadLines();
     }
 
     private List<((int, int), (int, int))> ExpandInput(List<string> input, int part)
@@ -49,7 +49,7 @@ public class Day11 : Day
 
         // cols
         int colsAdded = 0;
-        for (int c = 0; c < originalInput.Count(); c++)
+        for (int c = 0; c < originalInput.Count; c++)
         {
             string column = "";
             for (int r = 0; r < originalInput.Count; r++)
@@ -90,19 +90,17 @@ public class Day11 : Day
 
     private string Solve(int part)
     {
-        var pairs = this.ExpandInput(this.rawInput, part);
+        var pairs = this.ExpandInput(this.RawInput, part);
         long totalSum = 0;
         foreach (((int, int), (int, int)) pair in pairs)
         {
-            totalSum += Distance.Manhattan(pair.Item1, pair.Item2);
+            var distance = new Distance(pair.Item1, pair.Item2);
+            totalSum += distance.Manhattan();
         }
 
-
         return totalSum.ToString();
-
     }
 
     string Day.Part1() => Solve(1);
     string Day.Part2() => Solve(2);
-
 }

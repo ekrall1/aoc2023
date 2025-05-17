@@ -3,17 +3,16 @@ namespace Aoc2023
     using CoordWithDirection = System.ValueTuple<int, int, (int, int)>;
     public class AocGridDFS
     {
-        public (int, int) Start;
-        private Grid _Grid;
-
-        private Func<(int, int), List<(int, int)>, List<(int, int)>> _FilterFunc;
+        public (int, int) Start { get; set; }
+        public Grid Grid { get; private set; }
+        public Func<(int, int), List<(int, int)>, List<(int, int)>> FilterFunc { get; private set; }
 
         public AocGridDFS(Grid grid, (int, int) start, string puzzleDay)
         {
             Start = start;
-            _Grid = grid;
+            Grid = grid;
 
-            _FilterFunc = puzzleDay switch
+            FilterFunc = puzzleDay switch
             {
                 "Day10" => Day10Filter,
                 "Day14" => Day14Filter,
@@ -37,8 +36,8 @@ namespace Aoc2023
                 }
                 else
                 {
-                    List<(int, int)> neighbors = _Grid.NeighborsOfCoord(cur);
-                    var filteredNeighbors = _FilterFunc(cur, neighbors);
+                    List<(int, int)> neighbors = Grid.NeighborsOfCoord(cur);
+                    var filteredNeighbors = FilterFunc(cur, neighbors);
                     foreach (var item in filteredNeighbors)
                     {
                         if (!visited.Contains(item))
@@ -56,9 +55,9 @@ namespace Aoc2023
 
         public List<(int, int)> Day10Filter((int, int) cur, List<(int, int)> neighbors)
         {
-            var currentChar = _Grid.gridMap[cur];
+            var currentChar = Grid.GridMap[cur];
 
-            List<(int, int)> nextNeighbor = neighbors.Where(neighbor => _Grid.gridMap[neighbor] != '.').Where(neighbor =>
+            List<(int, int)> nextNeighbor = neighbors.Where(neighbor => Grid.GridMap[neighbor] != '.').Where(neighbor =>
             {
                 var nxt = currentChar switch
                 {
@@ -69,7 +68,7 @@ namespace Aoc2023
                     'J' => (neighbor.Item1 + 1, neighbor.Item2) == cur || (neighbor.Item1, neighbor.Item2 + 1) == cur,
                     '7' => (neighbor.Item1 - 1, neighbor.Item2) == cur || (neighbor.Item1, neighbor.Item2 + 1) == cur,
                     'F' => (neighbor.Item1 - 1, neighbor.Item2) == cur || (neighbor.Item1, neighbor.Item2 - 1) == cur,
-                    'S' => _Grid.gridMap[neighbor] != '.',
+                    'S' => Grid.GridMap[neighbor] != '.',
                     _ => false,
                 };
                 return nxt;
@@ -80,9 +79,9 @@ namespace Aoc2023
 
         public List<(int, int)> Day14Filter((int, int) cur, List<(int, int)> neighbors)
         {
-            var currentChar = _Grid.gridMap[cur];
+            var currentChar = Grid.GridMap[cur];
 
-            List<(int, int)> nextNeighbor = [.. neighbors.Where(neighbor => _Grid.gridMap[neighbor] == 'O')];
+            List<(int, int)> nextNeighbor = [.. neighbors.Where(neighbor => Grid.GridMap[neighbor] == 'O')];
 
             return nextNeighbor;
         }
@@ -107,7 +106,7 @@ namespace Aoc2023
 
         public List<CoordWithDirection> GetRotations(CoordWithDirection cur)
         {
-            var gridChar = _Grid.gridMap[(cur.Item1, cur.Item2)];
+            var gridChar = _Grid.GridMap[(cur.Item1, cur.Item2)];
             var nxtDirections = new List<CoordWithDirection>();
 
             switch (gridChar)
@@ -147,7 +146,7 @@ namespace Aoc2023
                 return [];
             }
 
-            var neighborChar = _Grid.gridMap[(neighbors[0].Item1, neighbors[0].Item2)];
+            var neighborChar = _Grid.GridMap[(neighbors[0].Item1, neighbors[0].Item2)];
 
             if (neighborChar == '.')
                 return neighbors;
@@ -183,7 +182,7 @@ namespace Aoc2023
             HashSet<CoordWithDirection> visited = new HashSet<CoordWithDirection>();
 
             List<CoordWithDirection> _start =
-                _Grid.gridMap[(Start.Item1, Start.Item2)] == '.'
+                _Grid.GridMap[(Start.Item1, Start.Item2)] == '.'
                     ? [Start]
                     : GetRotations(Start);
 

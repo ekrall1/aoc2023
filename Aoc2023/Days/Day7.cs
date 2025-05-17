@@ -3,13 +3,13 @@ using Aoc2023.Input;
 
 public class Day7 : Day
 {
-    private readonly IEnumerable<Hand> puzzleHands;
-    private Dictionary<char, int> cardOrder;
-    private Dictionary<string, HandValue> handValues;
+    public IEnumerable<Hand> PuzzleHands { get; private set; }
+    public Dictionary<char, int> CardOrder { get; private set; }
+    public Dictionary<string, HandValue> HandValues { get; private set; }
 
     public Day7(string filepath)
     {
-        cardOrder = new Dictionary<char, int> {
+        CardOrder = new Dictionary<char, int> {
             { 'A', 15 },
             { 'K', 14 },
             { 'Q', 13 },
@@ -25,12 +25,12 @@ public class Day7 : Day
             { '2', 3 },
         };
         var input = new InputReader(filepath).ReadLines();
-        puzzleHands = ParseHands(input);
-        handValues = new Dictionary<string, HandValue>();
+        PuzzleHands = ParseHands(input);
+        HandValues = new Dictionary<string, HandValue>();
     }
 
-    private record Hand(string Cards, int Wager);
-    private record HandValue(int Score, long HighCard, int Wager);
+    public record Hand(string Cards, int Wager);
+    public record HandValue(int Score, long HighCard, int Wager);
 
     private static IEnumerable<Hand> ParseHands(List<string> input)
     {
@@ -95,7 +95,7 @@ public class Day7 : Day
         foreach (var card in cardArray)
         {
             handCounter[card] = handCounter.GetValueOrDefault(card, 0) + 1;
-            highCardScore = highCardScore * baseValue + cardOrder[card];
+            highCardScore = highCardScore * baseValue + CardOrder[card];
         }
 
         int uniqueCards = handCounter.Count();
@@ -110,20 +110,20 @@ public class Day7 : Day
 
         if (part == 2)
         {
-            cardOrder['J'] = 1;
+            CardOrder['J'] = 1;
         }
 
         foreach (Hand hand in hands)
         {
-            if (!handValues.ContainsKey(hand.Cards))
+            if (!HandValues.ContainsKey(hand.Cards))
             {
-                handValues[hand.Cards] = ScoreHand(hand, part);
+                HandValues[hand.Cards] = ScoreHand(hand, part);
             }
             ;
 
         }
 
-        return handValues
+        return HandValues
             .OrderBy(kv => kv.Value.Score)
             .ThenBy(kv => kv.Value.HighCard)
             .Select((kv, idx) => (idx + 1) * kv.Value.Wager)
@@ -132,7 +132,7 @@ public class Day7 : Day
 
     }
 
-    string Day.Part1() => Solve(puzzleHands, 1);
-    string Day.Part2() => Solve(puzzleHands, 2);
+    string Day.Part1() => Solve(PuzzleHands, 1);
+    string Day.Part2() => Solve(PuzzleHands, 2);
 
 }

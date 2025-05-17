@@ -2,77 +2,76 @@ namespace Aoc2023
 {
     public class Grid
     {
+        public Dictionary<(int, int), char> GridMap { get; set; }
+        public Dictionary<(int, int), string> StringGridMap { get; set; }
+        public int Rows { get; set; }
+        public List<int> Cols { get; set; }
+        public (int, int)[] Dxdy { get; set; }  // directions
 
-        public Dictionary<(int, int), char> gridMap;
-        public Dictionary<(int, int), string> stringGridMap;
-        public int rows;
-        public List<int> cols;
-        public (int, int)[] dxdy;  // directions
         public Grid((int, int)[] dxdy)
         {
-            this.rows = 0;
-            this.cols = [];
-            this.gridMap = new Dictionary<(int, int), char> { };
-            this.stringGridMap = new Dictionary<(int, int), string> { };
-            this.dxdy = dxdy;
+            this.Rows = 0;
+            this.Cols = new List<int>();
+            this.GridMap = new Dictionary<(int, int), char>();
+            this.StringGridMap = new Dictionary<(int, int), string>();
+            this.Dxdy = dxdy;
         }
 
         public void Create(List<string> input)
         {
+            this.Rows = input.Count;
 
-            this.rows = input.Count;
-
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < Rows; i++)
             {
-                this.cols.Add(input[i].Length);
+                this.Cols.Add(input[i].Length);
 
-                for (int j = 0; j < cols[i]; j++)
+                for (int j = 0; j < Cols[i]; j++)
                 {
-                    this.gridMap[(i, j)] = input[i][j];
+                    this.GridMap[(i, j)] = input[i][j];
                 }
             }
-
         }
 
         public List<char> NeighborsOfChar((int, int) loc)
         {
-            List<char> neighbors = [];
+            List<char> neighbors = new List<char>();
 
-            for (int i = 0; i < dxdy.Length; i++)
+            for (int i = 0; i < Dxdy.Length; i++)
             {
-                int dx = loc.Item1 + dxdy[i].Item1;
-                int dy = loc.Item2 + dxdy[i].Item2;
+                int dx = loc.Item1 + Dxdy[i].Item1;
+                int dy = loc.Item2 + Dxdy[i].Item2;
 
                 if (dx < 0 || dy < 0)
                 {
                     continue;
                 }
 
-                if (dx >= this.rows || dy >= this.cols[dx])
+                if (dx >= this.Rows || dy >= this.Cols[dx])
                 {
                     continue;
                 }
 
-                neighbors.Add(this.gridMap[(dx, dy)]);
+                neighbors.Add(this.GridMap[(dx, dy)]);
             }
 
             return neighbors;
         }
+
         public List<(int, int)> NeighborsOfCoord((int, int) loc)
         {
-            List<(int, int)> neighbors = [];
+            List<(int, int)> neighbors = new List<(int, int)>();
 
-            for (int i = 0; i < dxdy.Length; i++)
+            for (int i = 0; i < Dxdy.Length; i++)
             {
-                int dx = loc.Item1 + dxdy[i].Item1;
-                int dy = loc.Item2 + dxdy[i].Item2;
+                int dx = loc.Item1 + Dxdy[i].Item1;
+                int dy = loc.Item2 + Dxdy[i].Item2;
 
                 if (dx < 0 || dy < 0)
                 {
                     continue;
                 }
 
-                if (dx >= this.rows || dy >= this.cols[dx])
+                if (dx >= this.Rows || dy >= this.Cols[dx])
                 {
                     continue;
                 }
@@ -85,14 +84,14 @@ namespace Aoc2023
 
         public List<(int, int, (int, int))> NeighborsOfCoordWithDirection((int, int, (int, int)) loc)
         {
-            List<(int, int, (int, int))> neighbors = [];
+            List<(int, int, (int, int))> neighbors = new List<(int, int, (int, int))>();
 
             int dx = loc.Item1 + loc.Item3.Item1;
             int dy = loc.Item2 + loc.Item3.Item2;
 
-            if (dx < 0 || dy < 0 || dx >= this.rows || dy >= this.cols[dx])
+            if (dx < 0 || dy < 0 || dx >= this.Rows || dy >= this.Cols[dx])
             {
-                return [];
+                return neighbors;
             }
 
             neighbors.Add((dx, dy, (loc.Item3.Item1, loc.Item3.Item2)));
@@ -110,7 +109,7 @@ namespace Aoc2023
                     int newX = loc.X + dx;
                     int newY = loc.Y + dy;
 
-                    if (newX < rows && newY < cols[newX])
+                    if (newX < Rows && newY < Cols[newX])
                     {
                         yield return new DijkstraGraph.NodeState(X: newX, Y: newY, DX: dx, DY: dy, Steps: 1);
                     }
@@ -122,14 +121,13 @@ namespace Aoc2023
             {
                 foreach (var d in new[] { (loc.DX, loc.DY) })
                 {
-
                     int dx = loc.X + d.Item1;
                     int dy = loc.Y + d.Item2;
 
                     if (dx < 0 || dy < 0)
                         continue;
 
-                    if (dx >= this.rows || dy >= this.cols[dx])
+                    if (dx >= this.Rows || dy >= this.Cols[dx])
                         continue;
 
                     var newNeighbor = new DijkstraGraph.NodeState(X: dx, Y: dy, DX: loc.DX, DY: loc.DY, Steps: loc.Steps + 1);
@@ -146,14 +144,13 @@ namespace Aoc2023
                     if (dx < 0 || dy < 0)
                         continue;
 
-                    if (dx >= this.rows || dy >= this.cols[dx])
+                    if (dx >= this.Rows || dy >= this.Cols[dx])
                         continue;
 
                     var newNeighbor = new DijkstraGraph.NodeState(X: dx, Y: dy, DX: d.Item1, DY: d.Item2, Steps: 1);
                     yield return newNeighbor;
                 }
             }
-
         }
     }
 

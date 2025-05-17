@@ -5,19 +5,22 @@ using Aoc2023.Cli;
 /// </summary>
 public class RunDay : ICommand
 {
-    private RunDayReceiver _receiver;
-    private string _day;
-    private string _part;
-    private string _filepath;
+    // Converted fields to properties with getters and setters
+    public RunDayReceiver Receiver { get; private set; }
+    public string Day { get; set; }
+    public string Part { get; set; }
+    public string Filepath { get; set; }
+
     public RunDay(RunDayReceiver receiver, string filepath, string day, string part)
     {
-        this._receiver = receiver;
-        this._day = day;
-        this._part = part;
-        this._filepath = filepath;
+        this.Receiver = receiver;
+        this.Day = day;
+        this.Part = part;
+        this.Filepath = filepath;
     }
+
     public void Execute()
     {
-        this._receiver.RunDay(this._filepath, this._day, this._part);
+        this.Receiver.RunDay(this.Filepath, this.Day, this.Part);
     }
 }

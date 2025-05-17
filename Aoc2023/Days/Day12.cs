@@ -4,14 +4,14 @@ using Aoc2023.Input;
 
 public class Day12 : Day
 {
-    private List<string> input;
+    public List<string> Input { get; private set; }
+    public static Dictionary<string, long> Memo { get; private set; } = new();
 
     public Day12(string filepath)
     {
-        this.input = new InputReader(filepath).ReadLines();
+        this.Input = new InputReader(filepath).ReadLines();
     }
 
-    private static Dictionary<string, long> memo = new();
     private string Solve(int part)
     {
         string springs = "";
@@ -19,7 +19,7 @@ public class Day12 : Day
         if (part == 2)
         {
             long ctr = 0;
-            foreach (var line in input)
+            foreach (var line in Input)
             {
                 var parts = line.Split(' ');
                 springs = string.Join("?", Enumerable.Repeat(parts[0], 5));
@@ -32,7 +32,7 @@ public class Day12 : Day
             }
             return ctr.ToString();
         }
-        return this.input
+        return this.Input
             .SelectMany(line =>
             {
                 var parts = line.Split(' ').ToList();
@@ -60,10 +60,9 @@ public class Day12 : Day
 
     private static long Part2Solver(List<char> springs, List<int> counts, List<char> acc)
     {
-
         string key = string.Join(",", springs) + "|" + string.Join(",", counts) + "|" + string.Concat(acc);
 
-        if (memo.TryGetValue(key, out long cachedVal))
+        if (Memo.TryGetValue(key, out long cachedVal))
         {
             return cachedVal;
         }
@@ -94,11 +93,10 @@ public class Day12 : Day
                     var newAcc = new List<char>(acc) { c };
                     res += Part2Solver(tl, counts, newAcc);
                 }
-                else  // if it's not a #, start a new accumulator
+                else
                 {
                     if (acc.Count > 0)
                     {
-                        // If a group just ended and it's a 'fit'
                         if (counts.Count > 0 && acc.Count == counts[0])
                         {
                             res += Part2Solver(tl, counts.Skip(1).ToList(), new List<char>());
@@ -111,11 +109,10 @@ public class Day12 : Day
                 }
             }
         }
-        memo[key] = res;
+        Memo[key] = res;
         return res;
     }
 
     string Day.Part1() => Solve(1);
     string Day.Part2() => Solve(2);
-
 }

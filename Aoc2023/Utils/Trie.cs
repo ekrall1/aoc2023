@@ -2,35 +2,28 @@ namespace Aoc2023.Utils
 {
     public class TrieNode
     {
-        public Dictionary<char, TrieNode> Children
-        {
-            get; set;
-        }
-        public bool EndOfWord
-        {
-            get; set;
-        }
+        public Dictionary<char, TrieNode> Children { get; set; }
+        public bool EndOfWord { get; set; }
 
         public TrieNode()
         {
             Children = new Dictionary<char, TrieNode>();
             EndOfWord = false;
         }
-
     }
 
     public class Trie
     {
-        private TrieNode root;
+        public TrieNode Root { get; private set; }
 
         public Trie()
         {
-            root = new TrieNode();
+            Root = new TrieNode();
         }
 
         public void Insert(string word)
         {
-            TrieNode cur = root;
+            TrieNode cur = Root;
 
             foreach (char c in word)
             {
@@ -45,7 +38,7 @@ namespace Aoc2023.Utils
 
         public string StartsWithWord(string prefix)
         {
-            TrieNode cur = root;
+            TrieNode cur = Root;
             string word = "";
 
             foreach (char c in prefix)

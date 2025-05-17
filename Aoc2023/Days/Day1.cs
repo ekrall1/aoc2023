@@ -4,18 +4,16 @@ using Aoc2023.Utils;
 
 public class Day1 : Day
 {
-
-    private string _filepath;
-    private List<string> _inputList;
-
-    private Dictionary<string, char> _digitStrings;
+    public string FilePath { get; private set; }
+    public List<string> InputList { get; private set; }
+    public Dictionary<string, char> DigitStrings { get; private set; }
 
     public Day1(string filepath)
     {
-        this._filepath = filepath;
-        InputReader fileInput = new InputReader(this._filepath);
-        this._inputList = fileInput.ReadLines();
-        this._digitStrings = new Dictionary<string, char> {
+        this.FilePath = filepath;
+        InputReader fileInput = new InputReader(this.FilePath);
+        this.InputList = fileInput.ReadLines();
+        this.DigitStrings = new Dictionary<string, char> {
             {"zero", '0'},
             {"one", '1'},
             {"two", '2'},
@@ -40,6 +38,7 @@ public class Day1 : Day
         }
         return '0';
     }
+
     private int FirstAndLastToInt(string line)
     {
         char[] charArray = line.ToCharArray();
@@ -62,7 +61,7 @@ public class Day1 : Day
     private Trie CreateTrie()
     {
         Trie trie = new Trie();
-        foreach (string number in this._digitStrings.Keys)
+        foreach (string number in this.DigitStrings.Keys)
         {
             trie.Insert(number);
         }
@@ -76,7 +75,7 @@ public class Day1 : Day
 
     private char GetDigitCharForNumber(string numberName)
     {
-        if (this._digitStrings.TryGetValue(numberName, out char intChar))
+        if (this.DigitStrings.TryGetValue(numberName, out char intChar))
         {
             return intChar;
         }
@@ -95,7 +94,7 @@ public class Day1 : Day
             string valid = LookupValidNumberInSubstr(trie, substr);
             if (valid.Length > 0)
             {
-                if (this._digitStrings.TryGetValue(valid, out char intChar))
+                if (this.DigitStrings.TryGetValue(valid, out char intChar))
                 {
                     return intChar;
                 }
@@ -116,7 +115,7 @@ public class Day1 : Day
             string valid = LookupValidNumberInSubstr(trie, substr);
             if (valid.Length > 0)
             {
-                if (this._digitStrings.TryGetValue(valid, out char intChar))
+                if (this.DigitStrings.TryGetValue(valid, out char intChar))
                 {
                     return intChar;
                 }
@@ -143,7 +142,6 @@ public class Day1 : Day
         return finalSum;
     }
 
-
     private string SolvePart1(List<string> lines)
     {
         return IterInputListP1(lines).ToString();
@@ -156,12 +154,11 @@ public class Day1 : Day
 
     string Day.Part1()
     {
-        return SolvePart1(this._inputList);
+        return SolvePart1(this.InputList);
     }
 
     string Day.Part2()
     {
-        return SolvePart2(this._inputList);
+        return SolvePart2(this.InputList);
     }
-
 }

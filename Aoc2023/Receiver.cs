@@ -2,6 +2,8 @@
 using Aoc2023.Days;
 public class RunDayReceiver
 {
+    // Added a property with a getter for the _days dictionary
+    public Dictionary<string, Func<string, Day>> Days => _days;
 
     private readonly Dictionary<string, Func<string, Day>> _days = new Dictionary<string, Func<string, Day>> {
         {"1", filepath => new Day1(filepath)},
@@ -23,8 +25,8 @@ public class RunDayReceiver
         {"17", filepath => new Day17(filepath) },
         {"18", filepath => new Day18(filepath) },
         {"19", filepath => new Day19(filepath) },
-
     };
+
     public void RunDay(string filepath, string day, string part)
     {
         if (_days.TryGetValue(day, out Func<string, Day>? dayRunner))

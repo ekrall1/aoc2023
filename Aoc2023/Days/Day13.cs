@@ -3,17 +3,17 @@ using Aoc2023.Input;
 
 public class Day13 : Day
 {
-    private List<string> input;
-    private List<List<string>> puzzlePatterns;
-    private List<List<string>> transpose;
+    public List<string> Input { get; private set; }
+    public List<List<string>> PuzzlePatterns { get; private set; }
+    public List<List<string>> Transpose { get; private set; }
 
     public Day13(string filepath)
     {
-        this.input = new InputReader(filepath).ReadLines();
-        this.puzzlePatterns = [];
-        this.transpose = [];
+        this.Input = new InputReader(filepath).ReadLines();
+        this.PuzzlePatterns = [];
+        this.Transpose = [];
 
-        var tmp = this.input
+        var tmp = this.Input
             .Aggregate(
                 new List<List<string>> { new List<string>() },
                 (acc, line) =>
@@ -33,11 +33,12 @@ public class Day13 : Day
         {
             if (puzz.Count > 0)
             {
-                this.puzzlePatterns.Add(puzz);
-                this.transpose.Add(GetPuzzleTranspose(puzz));
+                this.PuzzlePatterns.Add(puzz);
+                this.Transpose.Add(GetPuzzleTranspose(puzz));
             }
         }
     }
+
     private record RowSymmetry(bool hasSymmetry, int i, int j);
     private record ColSymmetry(bool hasSymmetry, int i, int j);
 
@@ -103,10 +104,10 @@ public class Day13 : Day
     {
         var score = 0;
 
-        for (int idx = 0; idx < this.puzzlePatterns.Count; idx++)
+        for (int idx = 0; idx < this.PuzzlePatterns.Count; idx++)
         {
-            var pattern = this.puzzlePatterns[idx];
-            var transposed = this.transpose[idx];
+            var pattern = this.PuzzlePatterns[idx];
+            var transposed = this.Transpose[idx];
 
             var rowSymPart1 = CheckRows(pattern, 0);
             var colSymPart1 = CheckRows(transposed, 0);
@@ -132,5 +133,4 @@ public class Day13 : Day
 
     string Day.Part1() => Solve(1);
     string Day.Part2() => Solve(2);
-
 }

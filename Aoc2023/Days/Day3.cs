@@ -5,39 +5,36 @@ using Aoc2023.Input;
 
 public class Day3 : Day
 {
-
-    private string _filepath;
-    private List<string> _inputList;
-    private Dictionary<(int, int), (int, (int, int))> _numberMap;
-    private List<(int, int)> _gears;
+    public string FilePath { get; private set; }
+    public List<string> InputList { get; private set; }
+    public Dictionary<(int, int), (int, (int, int))> NumberMap { get; private set; }
+    public List<(int, int)> Gears { get; private set; }
 
     public Day3(string filepath)
     {
-        this._filepath = filepath;
-        InputReader fileInput = new InputReader(this._filepath);
-        this._inputList = fileInput.ReadLines();
-        this._numberMap = new Dictionary<(int, int), (int, (int, int))> { };
-        this._gears = [];
+        this.FilePath = filepath;
+        InputReader fileInput = new InputReader(this.FilePath);
+        this.InputList = fileInput.ReadLines();
+        this.NumberMap = new Dictionary<(int, int), (int, (int, int))>();
+        this.Gears = new List<(int, int)>();
     }
 
     private Grid MakeGrid()
     {
         var grid = new Grid(dxdy: [(0, 1), (1, 0), (-1, 0), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1)]);
-        grid.Create(this._inputList);
+        grid.Create(this.InputList);
         return grid;
     }
 
     private void FillGears(Grid grid)
     {
+        for (int i = 0; i < grid.Rows; i++)
         {
-            for (int i = 0; i < grid.rows; i++)
+            for (int j = 0; j < grid.Cols[i]; j++)
             {
-                for (int j = 0; j < grid.cols[i]; j++)
+                if (grid.GridMap[(i, j)] == '*')
                 {
-                    if (grid.gridMap[(i, j)] == '*')
-                    {
-                        this._gears.Add((i, j));
-                    }
+                    this.Gears.Add((i, j));
                 }
             }
         }
@@ -45,19 +42,17 @@ public class Day3 : Day
 
     private void FillNumberMap(Grid grid)
     {
+        for (int i = 0; i < grid.Rows; i++)
         {
-            for (int i = 0; i < grid.rows; i++)
+            for (int j = 0; j < grid.Cols[i]; j++)
             {
-                for (int j = 0; j < grid.cols[i]; j++)
+                if (char.IsDigit(grid.GridMap[(i, j)]))
                 {
-                    if (char.IsDigit(grid.gridMap[(i, j)]))
+                    var startCoord = (i, j);
+                    var (coords, strNum) = ExtractNumber(i, ref j, grid);
+                    if (int.TryParse(strNum, out var finalNum))
                     {
-                        var startCoord = (i, j);
-                        var (coords, strNum) = ExtractNumber(i, ref j, grid);
-                        if (int.TryParse(strNum, out var finalNum))
-                        {
-                            coords.ForEach(coord => this._numberMap[coord] = (finalNum, startCoord));
-                        }
+                        coords.ForEach(coord => this.NumberMap[coord] = (finalNum, startCoord));
                     }
                 }
             }
@@ -67,43 +62,42 @@ public class Day3 : Day
     private int GearProduct(Grid grid)
     {
         var sumProduct = 0;
-        for (int i = 0; i < this._gears.Count; i++)
+        for (int i = 0; i < this.Gears.Count; i++)
         {
-            var neighbors = grid.NeighborsOfCoord(this._gears[i]);
+            var neighbors = grid.NeighborsOfCoord(this.Gears[i]);
             if (neighbors == null)
             {
                 continue;
             }
             var prod = 0;
-            var visited = new HashSet<(int, (int, int))> { };
+            var visited = new HashSet<(int, (int, int))>();
             neighbors.ForEach(neighbor =>
             {
-                if (this._numberMap.ContainsKey(neighbor) && !visited.Contains(this._numberMap[neighbor]))
+                if (this.NumberMap.ContainsKey(neighbor) && !visited.Contains(this.NumberMap[neighbor]))
                 {
-                    prod = Math.Max(prod, 1) * this._numberMap[neighbor].Item1;
-                    visited.Add(this._numberMap[neighbor]);
+                    prod = Math.Max(prod, 1) * this.NumberMap[neighbor].Item1;
+                    visited.Add(this.NumberMap[neighbor]);
                 }
             });
             if (visited.Count > 1)
             {
                 sumProduct += prod;
             }
-
         }
         return sumProduct;
     }
+
     private int FindSum(Grid grid)
     {
         var finalSum = 0;
 
-        for (int i = 0; i < grid.rows; i++)
+        for (int i = 0; i < grid.Rows; i++)
         {
-            for (int j = 0; j < grid.cols[i]; j++)
+            for (int j = 0; j < grid.Cols[i]; j++)
             {
-                if (char.IsDigit(grid.gridMap[(i, j)]))
+                if (char.IsDigit(grid.GridMap[(i, j)]))
                 {
                     var (coords, strNum) = ExtractNumber(i, ref j, grid);
-
                     finalSum += SumPart(strNum, coords, grid);
                 }
             }
@@ -113,7 +107,6 @@ public class Day3 : Day
 
     private int SumPart(string? strNum, List<(int, int)>? coords, Grid grid)
     {
-
         if (coords == null)
         {
             return 0;
@@ -127,12 +120,10 @@ public class Day3 : Day
                 {
                     return finalNum;
                 }
-
             }
         }
         return 0;
     }
-
 
     private (List<(int, int)>, string) ExtractNumber(int row, ref int startCol, Grid grid)
     {
@@ -141,10 +132,10 @@ public class Day3 : Day
 
         // Traverse row to find the number
         int col = startCol;
-        while (col < grid.cols[row] && char.IsDigit(grid.gridMap[(row, col)]))
+        while (col < grid.Cols[row] && char.IsDigit(grid.GridMap[(row, col)]))
         {
             coords.Add((row, col));
-            strNum.Append(grid.gridMap[(row, col)]);
+            strNum.Append(grid.GridMap[(row, col)]);
             col++;
         }
 
@@ -167,5 +158,4 @@ public class Day3 : Day
         this.FillNumberMap(grid);
         return this.GearProduct(grid).ToString();
     }
-
 }

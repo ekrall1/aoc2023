@@ -5,11 +5,11 @@ using Aoc2023.Input;
 
 public class Day14 : Day
 {
-    private List<string> input;
+    public List<string> Input { get; private set; }
 
     public Day14(string filepath)
     {
-        this.input = new InputReader(filepath).ReadLines();
+        this.Input = new InputReader(filepath).ReadLines();
     }
     private List<string> TiltNorth(List<string> data)
     {
@@ -80,14 +80,14 @@ public class Day14 : Day
         var totalSum = 0;
         if (part == 1)
         {
-            var sortedCols = TiltNorth(this.input);
+            var sortedCols = TiltNorth(this.Input);
             totalSum = RockConfigTotalLoad(sortedCols);
         }
 
         if (part == 2)
         {
             List<string> hashes = [];
-            List<string> data = this.input;
+            List<string> data = this.Input;
             Dictionary<int, List<string>> rocksCache = new Dictionary<int, List<string>>();
             int cycleDetected = -1;
             int ctr = 1;
@@ -102,7 +102,7 @@ public class Day14 : Day
                 cycleDetected = Cycles.FloydsCycleDetection(hashes);
             }
             Cycles.Cycle cycle = Cycles.FloydsCycleStartLength(hashes, cycleDetected);
-            int finalIdx = cycle.start + (1000000000 - cycle.start) % cycle.length;
+            int finalIdx = cycle.Start + (1000000000 - cycle.Start) % cycle.Length;
             totalSum = RockConfigTotalLoad(rocksCache[finalIdx]);
         }
         return totalSum.ToString();

@@ -2,7 +2,7 @@ namespace Aoc2023
 {
     public class Polygon
     {
-        public List<(int, int)> Coords;
+        public List<(int, int)> Coords { get; set; }
 
         public Polygon(List<(int, int)> polygon)
         {

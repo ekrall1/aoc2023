@@ -4,17 +4,17 @@ using Aoc2023.Input;
 
 public class Day9 : Day
 {
-    private readonly List<string> input;
+    public List<string> Input { get; private set; }
 
     public Day9(string filepath)
     {
-        input = new InputReader(filepath).ReadLines();
+        Input = new InputReader(filepath).ReadLines();
     }
 
     private string Solve(int part)
     {
         var totalSum = 0;
-        foreach (var line in input)
+        foreach (var line in Input)
         {
             AocLinkedList<List<int>> llst = new AocLinkedList<List<int>>();
             var cur = line.Split(' ').Select(ch => int.Parse(ch)).ToList();
@@ -44,5 +44,4 @@ public class Day9 : Day
 
     string Day.Part1() => Solve(1);
     string Day.Part2() => Solve(2);
-
 }
