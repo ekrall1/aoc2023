@@ -1,22 +1,39 @@
+using System.Numerics;
+
 namespace Aoc2023
 {
-    class Factor
+    public static class Factor
     {
-        public static long Gcf(long x, long y)
+        public static T Gcf<T>(params T[] values) where T : INumber<T>
         {
-            while (y != 0)
-            {
-                long tmp = y;
-                y = x % y;
-                x = tmp;
-            }
+            if (values == null || values.Length == 0)
+                throw new ArgumentException("At least one value is required.");
 
-            return x;
+            T result = values[0];
+            for (int i = 1; i < values.Length; i++)
+            {
+                T y = values[i];
+                while (y != T.Zero)
+                {
+                    T tmp = y;
+                    y = result % y;
+                    result = tmp;
+                }
+            }
+            return result;
         }
 
-        public static long Lcm(long x, long y)
+        public static T Lcm<T>(params T[] values) where T : INumber<T>
         {
-            return x / Gcf(x, y) * y;
+            if (values == null || values.Length == 0)
+                throw new ArgumentException("At least one value is required.");
+
+            T result = values[0];
+            for (int i = 1; i < values.Length; i++)
+            {
+                result = result / Gcf(result, values[i]) * values[i];
+            }
+            return result;
         }
     }
 }

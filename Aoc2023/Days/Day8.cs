@@ -1,6 +1,7 @@
 using Aoc2023;
 using Aoc2023.Days;
 using Aoc2023.Input;
+using Aoc2023.Utils;
 
 public class Day8 : Day
 {
@@ -106,23 +107,7 @@ public class Day8 : Day
             }
         }
 
-        return cycles.Aggregate((long)1, (acc, n) => Lcm(acc, n)).ToString();
-    }
-
-    static long Gcf(long a, long b)
-    {
-        while (b != 0)
-        {
-            long temp = b;
-            b = a % b;
-            a = temp;
-        }
-        return a;
-    }
-
-    static long Lcm(long a, long b)
-    {
-        return a / Gcf(a, b) * b;
+        return cycles.Aggregate((long)1, (acc, n) => Factor.Lcm<long>([acc, n])).ToString();
     }
 
     string Day.Part1() => Solve();

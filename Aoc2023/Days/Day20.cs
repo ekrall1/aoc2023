@@ -1,6 +1,7 @@
-using System.Text.RegularExpressions;
+using Aoc2023;
 using Aoc2023.Days;
 using Aoc2023.Input;
+using Aoc2023.Utils;
 
 
 public partial class Day20 : Day
@@ -43,7 +44,6 @@ public partial class Day20 : Day
         {
             if (pulse == Pulse.High)
             {
-
                 return Enumerable.Empty<(string target, Pulse pulse)>();
             }
 
@@ -51,7 +51,6 @@ public partial class Day20 : Day
             var outputPulse = IsOn ? Pulse.High : Pulse.Low;
             return Outputs.Select(output => (output, outputPulse));
         }
-
     }
 
     private class Conjunction : IModule
@@ -74,7 +73,6 @@ public partial class Day20 : Day
             Pulse outPulse = lastReceived.Values.All(p => p == Pulse.High) ? Pulse.Low : Pulse.High;
             return Outputs.Select(output => (output, outPulse));
         }
-
     }
 
     private class Propagation
@@ -86,7 +84,7 @@ public partial class Day20 : Day
         {
             modules[module.Name] = module;
         }
-        
+
         public void Connect(string from, string to)
         {
             if (modules.TryGetValue(from, out var fromModule))
@@ -98,18 +96,25 @@ public partial class Day20 : Day
             }
         }
 
-        public (int lowCount, int highCount) Simulate(int buttonPresses)
+        public (long lowCount, long highCount, Dictionary<string, long> shotsDict) Simulate(long buttonPresses, IModule? magicConjunction)
         {
-            int lowCount = 0, highCount = 0;
+            long lowCount = 0, highCount = 0;
+            long i = 0;
+            Dictionary<string, long> conjunctionInput = new();
 
-            for (int i = 0; i < buttonPresses; i++)
+            while (i < buttonPresses)
             {
+                i++;
                 var queue = new Queue<(string sender, string receiver, Pulse pulse)>();
                 queue.Enqueue(("button", "broadcaster", Pulse.Low));
 
                 while (queue.Count > 0)
                 {
                     var (sender, receiver, pulse) = queue.Dequeue();
+
+                    if (magicConjunction != null && receiver == magicConjunction.Name && pulse == Pulse.High)
+                        if (!conjunctionInput.ContainsKey(sender))
+                            conjunctionInput[sender] = i;
 
                     if (pulse == Pulse.Low) lowCount++;
                     else highCount++;
@@ -122,13 +127,12 @@ public partial class Day20 : Day
                         queue.Enqueue((receiver, target, outPulse));
                     }
                 }
-
             }
 
-            return (lowCount, highCount);
+            return (lowCount, highCount, conjunctionInput);
         }
-
     }
+
     private string Solve(int part)
     {
         var propagation = new Propagation();
@@ -164,17 +168,37 @@ public partial class Day20 : Day
             {
                 connections.Add((sourceName, target));
             }
-
         }
 
         foreach (var (from, to) in connections)
         {
             propagation.Connect(from, to);
         }
+        IModule? magicConjunction = null;
 
-        int shots = part == 1 ? 1000 : 1;
-        (int low, int high) = propagation.Simulate(shots);
-        return (low * high).ToString();
+        if (part == 2)
+        {
+            List<IModule> magicConjunctions = propagation.GetModules()
+                .Where(module => module.Outputs.Contains("rx"))
+                .ToList();
+            magicConjunction = magicConjunctions.Count > 0 ? magicConjunctions[0] : null;
+        }
+
+        long shots = part == 1 ? 1000L : 10000L;
+        (long low, long high, Dictionary<string, long> shotsDict) = propagation.Simulate(shots, magicConjunction);
+
+        if (part == 1)
+        {
+            return (low * high).ToString();
+        }
+        else if (part == 2)
+        {
+            return Factor.Lcm<long>([.. shotsDict.Values]).ToString();
+        }
+        else
+        {
+            throw new ArgumentException("Invalid part number");
+        }
     }
 
     string Day.Part1() => Solve(1);
