@@ -2,7 +2,6 @@ using System.Numerics;
 using Aoc2023;
 using Aoc2023.Days;
 using Aoc2023.Input;
-using Aoc2023.Utils;
 
 
 public partial class Day21 : Day
