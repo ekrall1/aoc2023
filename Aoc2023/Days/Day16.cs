@@ -14,7 +14,7 @@ public partial class Day16 : Day
 
     private int SolveWithDFS(Grid grid, CoordWithDirection coord)
     {
-        var dfs = new AocGridDFSWithDirection(grid, coord);
+        IAocGridDFSWithDirection dfs = GridDfsWithDirectionFactory.Create(grid, coord, "Day16");
         var allVisited = dfs.Search([]);
         return allVisited.Select(visited => (visited.Item1, visited.Item2)).ToHashSet().Count;
     }

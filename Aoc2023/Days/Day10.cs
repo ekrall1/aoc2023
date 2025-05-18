@@ -35,13 +35,15 @@ public class Day10 : Day
         if (part == 1)
         {
             (int, int) start = GetStartFromGrid(Grid);
-            HashSet<(int, int)> path = new AocGridDFS(Grid, start, "Day10").Search([]);
+            IAocGridDFS dfs = GridDfsFactory.Create("Day10", Grid, start);
+            HashSet<(int, int)> path = dfs.Search([]);
             return (path.Count() / 2).ToString();
         }
         else
         {
             (int, int) start = GetStartFromGrid(Grid);
-            HashSet<(int, int)> path = new AocGridDFS(Grid, start, "Day10").Search([]);
+            IAocGridDFS dfs = GridDfsFactory.Create("Day10", Grid, start);
+            HashSet<(int, int)> path = dfs.Search([]);
             Polygon polygon = new Polygon(path.ToList());
             List<(int, int)> points = GetNonPathPoints(Grid, path);
 

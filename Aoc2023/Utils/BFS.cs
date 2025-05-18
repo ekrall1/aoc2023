@@ -18,10 +18,6 @@ namespace Aoc2023
         private readonly HashSet<(int, int)> VisitedCoord = new();
         private readonly Queue<((int, int) coord, int steps)> BFSQueue = new();
         public Dictionary<long, long> Plots = new();
-        public Dictionary<int, int> ResultCoordsEvenCount = new();
-        public Dictionary<int, int> ResultCoordsOddCount = new();
-        public HashSet<(int, int)> ResultCoordsOdd = new();
-        public HashSet<(int, int)> ResultCoordsEven = new();
         private long MaxSteps { get; set; }
         private int Part { get; set; }
 
