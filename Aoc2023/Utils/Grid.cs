@@ -82,6 +82,27 @@ namespace Aoc2023
             return neighbors;
         }
 
+        public (List<(int, int)> Wrapped, List<(int, int)> Unwrapped) InfiniteRepeatingNeighborsOfCoord((int, int) loc, int rows, int cols)
+        {
+            List<(int, int)> neighbors = new List<(int, int)>();
+            List<(int, int)> neighborsUnwrapped = new List<(int, int)>();
+
+            for (int i = 0; i < Dxdy.Length; i++)
+            {
+
+                int newY = loc.Item1 + Dxdy[i].Item1;
+                int newX = loc.Item2 + Dxdy[i].Item2;
+
+                int wrappedY = ((newY % rows) + rows) % rows;
+                int wrappedX = ((newX % cols) + cols) % cols;
+
+                neighbors.Add((wrappedY, wrappedX));
+                neighborsUnwrapped.Add((newY, newX));
+            }
+
+            return (Wrapped: neighbors, Unwrapped: neighborsUnwrapped);
+        }
+
         public List<(int, int, (int, int))> NeighborsOfCoordWithDirection((int, int, (int, int)) loc)
         {
             List<(int, int, (int, int))> neighbors = new List<(int, int, (int, int))>();

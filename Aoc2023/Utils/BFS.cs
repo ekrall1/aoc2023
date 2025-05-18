@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Runtime.ConstrainedExecution;
 
 namespace Aoc2023
@@ -9,51 +10,82 @@ namespace Aoc2023
         S Search();
     }
 
-    public class Day21BFS : IGridBFSSearch<(int, int), long>
+    public class Day21BFS : IGridBFSSearch<(int, int), Dictionary<long, long>>
     {
         public Grid Grid { get; set; }
         public (int, int) Start { get; set; }
         private readonly HashSet<((int, int) coord, int steps)> Visited = new();
+        private readonly HashSet<(int, int)> VisitedCoord = new();
         private readonly Queue<((int, int) coord, int steps)> BFSQueue = new();
-        private readonly HashSet<(int, int)> ResultCoords = new();
+        public Dictionary<long, long> Plots = new();
+        public Dictionary<int, int> ResultCoordsEvenCount = new();
+        public Dictionary<int, int> ResultCoordsOddCount = new();
+        public HashSet<(int, int)> ResultCoordsOdd = new();
+        public HashSet<(int, int)> ResultCoordsEven = new();
         private long MaxSteps { get; set; }
+        private int Part { get; set; }
 
-        public Day21BFS(Grid grid, (int, int) start, long maxSteps)
+        public Day21BFS(Grid grid, (int, int) start, long maxSteps, int part)
         {
             Grid = grid;
             Start = start;
             BFSQueue.Enqueue((start, 0));
             MaxSteps = maxSteps;
+            Part = part;
         }
 
-        public long Search()
+        public Dictionary<long, long> Search()
         {
             int rows = Grid.Rows;
             int cols = Grid.Cols.Count;
-
             while (BFSQueue.Count > 0)
             {
                 var ((y, x), steps) = BFSQueue.Dequeue();
-                if (steps > MaxSteps)
-                    continue;
 
-                if (!Visited.Add(((x, y), steps)))
+                if (steps == MaxSteps + 1 || Visited.Contains(((y, x), steps)))
                     continue;
+                Visited.Add(((y, x), steps));
 
-                if (steps == MaxSteps)
+                if (Part == 2 && VisitedCoord.Contains((y, x)))
+                    continue;
+                VisitedCoord.Add((y, x));
+
+                if (!Plots.TryGetValue(steps, out var set))
                 {
-                    ResultCoords.Add((x, y));
-                    continue;
+                    Plots[steps] = 0;
+                }
+                Plots[steps] += 1;
+
+                IEnumerable<(int, int)> neighbors;
+                IEnumerable<(int, int)> queueNeighbors;
+                if (Part == 1)
+                {
+                    neighbors = Grid.NeighborsOfCoord((y, x));
+                    queueNeighbors = neighbors;
+                }
+                else
+                {
+                    var infiniteNeighbors = Grid.InfiniteRepeatingNeighborsOfCoord((y, x), rows, cols);
+                    queueNeighbors = infiniteNeighbors.Unwrapped;
+                    neighbors = infiniteNeighbors.Wrapped;
                 }
 
-                List<(int, int)> neighbors = Grid.NeighborsOfCoord((y, x));
-                foreach ((int, int) neighbor in neighbors)
+                using var neighborEnumerator = neighbors.GetEnumerator();
+                using var queueEnumerator = queueNeighbors.GetEnumerator();
+
+                while (neighborEnumerator.MoveNext() && queueEnumerator.MoveNext())
                 {
+                    var neighbor = neighborEnumerator.Current;
+                    var queueNeighbor = queueEnumerator.Current;
+
                     if (Grid.GridMap[neighbor] != '#')
-                        BFSQueue.Enqueue((neighbor, steps + 1));
+                    {
+                        BFSQueue.Enqueue((queueNeighbor, steps + 1));
+                    }
                 }
             }
-            return ResultCoords.Count;
+
+            return Plots;
         }
     }
 }
