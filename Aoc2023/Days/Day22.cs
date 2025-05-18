@@ -180,8 +180,39 @@ public partial class Day22 : Day
             }
             return removable.ToString();
         }
-        // For part 2, not implemented
-        return "not implemented";
+        else if (part == 2)
+        {
+            int total = 0;
+            foreach (var brick in Bricks)
+            {
+                HashSet<Brick> fallenBricks = new HashSet<Brick>();
+
+                var queue = new Queue<Brick>();
+
+                fallenBricks.Add(brick);
+                queue.Enqueue(brick);
+
+                while (queue.Count > 0)
+                {
+                    var currentBrick = queue.Dequeue();
+                    foreach (Brick candidateBrick in currentBrick.Supporting)
+                    {
+                        if (fallenBricks.Contains(candidateBrick))
+                            continue;
+
+                        if (candidateBrick.SupportedBy.All(br => fallenBricks.Contains(br)))
+                        {
+                            fallenBricks.Add(candidateBrick);
+                            queue.Enqueue(candidateBrick);
+                        }
+                    }
+                }
+                total += fallenBricks.Count - 1;
+            }
+            return total.ToString();
+        }
+        else
+            throw new NotImplementedException($"Part {part} is an invalid part. Only parts 1 and 2 are valid.");
     }
 
     string Day.Part1() => Solve(1);
