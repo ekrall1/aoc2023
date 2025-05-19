@@ -15,15 +15,17 @@ public partial class Day23 : Day
     public Dictionary<(int, int), List<((int, int) dest, int dist)>> ReducedGraph { get; private set; }
     public (int, int) Start { get; set; }
     public (int, int) End { get; set; }
+    public int MaxEdgeLength { get; set; }
+
     public Day23(string filepath)
     {
         Input = new InputReader(filepath).ReadLines();
         Grid = new Grid([(0, 1), (0, -1), (1, 0), (-1, 0)]);
         Grid.Create(Input);
         (Start, End) = ScanGridForStartAndEnd();
-        Intersections = GetIntersections();
-        ReducedGraph = GetReducedGraph();
-
+        Intersections = new();
+        ReducedGraph = new();
+        MaxEdgeLength = 0;
     }
 
     private ((int, int) start, (int, int) end) ScanGridForStartAndEnd()
@@ -51,7 +53,7 @@ public partial class Day23 : Day
         return (start.Value, end.Value);
     }
 
-    private HashSet<(int, int)> GetIntersections()
+    private HashSet<(int, int)> GetIntersections(int part)
     {
         var intersections = new HashSet<(int, int)>();
         foreach (var kvp in Grid.GridMap)
@@ -67,7 +69,7 @@ public partial class Day23 : Day
             }
 
             // Forced direction tiles are intersections
-            if (val == '>' || val == '<' || val == '^' || val == 'v')
+            if (part == 1 && (val == '>' || val == '<' || val == '^' || val == 'v'))
             {
                 intersections.Add(pos);
                 continue;
@@ -113,7 +115,7 @@ public partial class Day23 : Day
                p.Item2 >= 0 && p.Item2 < Grid.Cols.Count;
     }
 
-    private Dictionary<(int, int), List<((int, int) dest, int dist)>> GetReducedGraph()
+    private Dictionary<(int, int), List<((int, int) dest, int dist)>> GetReducedGraph(int part)
     {
         var graph = new Dictionary<(int, int), List<((int, int) dest, int dist)>>();
 
@@ -134,10 +136,10 @@ public partial class Day23 : Day
                     char tile = Grid.GridMap[current];
 
                     // Enforce forced direction if present
-                    if (tile == '>' && dir != (0, 1)) break;
-                    if (tile == '<' && dir != (0, -1)) break;
-                    if (tile == '^' && dir != (-1, 0)) break;
-                    if (tile == 'v' && dir != (1, 0)) break;
+                    if (tile == '>' && dir != (0, 1) && part == 1) break;
+                    if (tile == '<' && dir != (0, -1) && part == 1) break;
+                    if (tile == '^' && dir != (-1, 0) && part == 1) break;
+                    if (tile == 'v' && dir != (1, 0) && part == 1) break;
 
                     if (Intersections.Contains(current))
                     {
@@ -162,48 +164,57 @@ public partial class Day23 : Day
 
         return graph;
     }
-
+    int MaxRemainingEstimate((int x, int y) current)
+    {
+        return 1000 * Math.Abs(current.x - End.Item1) + Math.Abs(current.y - End.Item2);
+    }
 
     private long FindAllPathsDFS()
     {
-        long results = 0;
-        var stack = new Stack<((int, int) pos, long dist, List<(int, int)> path, HashSet<(int, int)> visited)>();
+        long best = long.MinValue;
 
-        stack.Push((Start, 0, new List<(int, int)> { Start }, new HashSet<(int, int)> { Start }));
-
-        while (stack.Count > 0)
+        void Dfs((int x, int y) current, HashSet<(int, int)> visited, long currentLength)
         {
-            var (current, dist, path, visited) = stack.Pop();
-
             if (current == End)
             {
-                results = Math.Max(results, dist);
-                continue;
+                if (currentLength > best)
+                    best = currentLength;
+                return;
             }
 
+            if (currentLength + MaxRemainingEstimate(current) <= best)
+                return;
+
             if (!ReducedGraph.TryGetValue(current, out var neighbors))
-                continue;
+                return;
 
             foreach (var (to, edgeDist) in neighbors)
             {
                 if (visited.Contains(to))
                     continue;
 
-                var newPath = new List<(int, int)>(path) { to };
-                var newVisited = new HashSet<(int, int)>(visited) { to };
-                stack.Push((to, dist + edgeDist, newPath, newVisited));
+                visited.Add(to);
+                Dfs(to, visited, currentLength + edgeDist);
+                visited.Remove(to);
             }
         }
 
+        var visited = new HashSet<(int, int)> { Start };
+        Dfs(Start, visited, 0);
 
-        return results;
+        return best;
     }
     private string Solve(int part)
     {
-        if (part == 1)
-        {
-            return FindAllPathsDFS().ToString();
-        }
+        Intersections = GetIntersections(part);
+        ReducedGraph = GetReducedGraph(part);
+        int max = 0;
+        foreach (var list in ReducedGraph.Values)
+            foreach (var (_, dist) in list)
+                max = Math.Max(max, dist);
+        MaxEdgeLength = max;
+
+        return FindAllPathsDFS().ToString();
         throw new NotImplementedException($"Part {part} is an invalid part. Only parts 1 and 2 are valid.");
     }
 
