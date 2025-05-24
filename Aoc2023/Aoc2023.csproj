@@ -15,4 +15,8 @@
     <None Include="C:\Users\krall\Source\Repos\aoc2023\Aoc2023\.editorconfig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+  </ItemGroup>
+
 </Project>

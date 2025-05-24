@@ -1,6 +1,9 @@
-using System.Drawing;
-using Aoc2023.Days;
+﻿using Aoc2023.Days;
 using Aoc2023.Input;
+using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Double;
+using System.Linq;
+
 public partial class Day24 : Day
 {
     public record Position(long x, long y, long z);
@@ -69,26 +72,103 @@ public partial class Day24 : Day
         return true;
     }
 
-    private string Solve(int part)
+    private static IEnumerable<List<T>> Combinations<T>(List<T> list, int k)
     {
-        var intersections = 0;
-        decimal min = 200000000000000m;
-        decimal max = 400000000000000m;
-        for (int i = 0; i < Hailstones.Count; i++)
+        if (k == 0) yield return new List<T>();
+        else
         {
-            for (int j = i + 1; j < Hailstones.Count; j++)
+            for (int i = 0; i < list.Count; i++)
             {
-                if (TryIntersection(Hailstones[i], Hailstones[j], out decimal x, out decimal y))
+                var remaining = list.Skip(i + 1).ToList();
+                foreach (var combo in Combinations(remaining, k - 1))
                 {
-                    if (x >= min && x <= max && y >= min && y <= max)
-                    {
-                        intersections++;
-                    }
+                    combo.Insert(0, list[i]);
+                    yield return combo;
                 }
             }
         }
-        return intersections.ToString();
-        throw new NotImplementedException($"Part {part} is an invalid part.");
+    }
+    private string Solve(int part)
+    {
+        if (part == 1)
+        {
+            var intersections = 0;
+            decimal min = 200000000000000m;
+            decimal max = 400000000000000m;
+            for (int i = 0; i < Hailstones.Count; i++)
+            {
+                for (int j = i + 1; j < Hailstones.Count; j++)
+                {
+                    if (TryIntersection(Hailstones[i], Hailstones[j], out decimal x, out decimal y))
+                    {
+                        if (x >= min && x <= max && y >= min && y <= max)
+                        {
+                            intersections++;
+                        }
+                    }
+                }
+            }
+            return intersections.ToString();
+        }
+        else if (part == 2)
+        {
+            // Use 4 hailstones to set up 6 equations in 6 unknowns (rx, ry, rz, vx, vy, vz)
+            // For each pair (i, j): (p_i - p_j) + (v_i - v_j) * t = (v - v) * t
+            // But we can eliminate t by cross-multiplying equations for two hailstones
+
+            var h0 = Hailstones[0];
+            var h1 = Hailstones[1];
+            var h2 = Hailstones[2];
+            var h3 = Hailstones[3];
+
+            // For each pair, set up:
+            // (rx - px0) / (vx - vx0) = (ry - py0) / (vy - vy0) = (rz - pz0) / (vz - vz0) = t0
+            // (rx - px1) / (vx - vx1) = (ry - py1) / (vy - vy1) = (rz - pz1) / (vz - vz1) = t1
+            // Eliminate t0, t1 by cross-multiplying and subtracting
+
+            // Set up 6 equations (x-y and x-z for 3 pairs)
+            var hs = new[] { h0, h1, h2, h3 };
+            var A = new double[6, 6];
+            var B = new double[6];
+
+            for (int i = 1; i <= 3; i++)
+            {
+                var a = hs[0];
+                var b = hs[i];
+
+                // (rx - ax)/(vx - avx) = (ry - ay)/(vy - avy)
+                // Cross-multiplied:
+                // (rx - ax)*(vy - avy) = (ry - ay)*(vx - avx)
+                // Expand:
+                // rx*(vy - avy) - ax*(vy - avy) = ry*(vx - avx) - ay*(vx - avx)
+                // rx*(vy - avy) - ry*(vx - avx) = ax*(vy - avy) - ay*(vx - avx)
+
+                // x-y equation
+                A[2 * (i - 1), 0] = (b.v.y - a.v.y); // rx
+                A[2 * (i - 1), 1] = -(b.v.x - a.v.x); // ry
+                A[2 * (i - 1), 3] = -(b.p.y - a.p.y); // vx
+                A[2 * (i - 1), 4] = (b.p.x - a.p.x); // vy
+                B[2 * (i - 1)] = (b.p.x * b.v.y - a.p.x * a.v.y) - (b.p.y * b.v.x - a.p.y * a.v.x);
+
+                // x-z equation
+                A[2 * (i - 1) + 1, 0] = (b.v.z - a.v.z); // rx
+                A[2 * (i - 1) + 1, 2] = -(b.v.x - a.v.x); // rz
+                A[2 * (i - 1) + 1, 3] = -(b.p.z - a.p.z); // vx
+                A[2 * (i - 1) + 1, 5] = (b.p.x - a.p.x); // vz
+                B[2 * (i - 1) + 1] = (b.p.x * b.v.z - a.p.x * a.v.z) - (b.p.z * b.v.x - a.p.z * a.v.x);
+            }
+
+            var matrix = Matrix<double>.Build.DenseOfArray(A);
+            var vector = Vector<double>.Build.DenseOfArray(B);
+            var solution = matrix.Solve(vector);
+
+            long rx = (long)Math.Round(solution[0]);
+            long ry = (long)Math.Round(solution[1]);
+            long rz = (long)Math.Round(solution[2]);
+
+            return (rx + ry + rz).ToString();
+        }
+        return "";
     }
 
     string Day.Part1() => Solve(1);
