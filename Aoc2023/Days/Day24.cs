@@ -112,21 +112,15 @@ public partial class Day24 : Day
         }
         else if (part == 2)
         {
-            // Use 4 hailstones to set up 6 equations in 6 unknowns (rx, ry, rz, vx, vy, vz)
-            // For each pair (i, j): (p_i - p_j) + (v_i - v_j) * t = (v - v) * t
-            // But we can eliminate t by cross-multiplying equations for two hailstones
+            // Use 4 hailstones to set up 6 equations in 6 unknowns (rx, ry, rz, vx, vy, vz) (for the rock)
+            // Each hailstone satisfies: (rx - px) / (vx - vxh) = (ry - py) / (vy - vyh) = (rz - pz) / (vz - vzh) = t
+            // where px, py, pz is the hailstone's position and vxh, vyh, vzh is its velocity.
 
             var h0 = Hailstones[0];
             var h1 = Hailstones[1];
             var h2 = Hailstones[2];
             var h3 = Hailstones[3];
 
-            // For each pair, set up:
-            // (rx - px0) / (vx - vx0) = (ry - py0) / (vy - vy0) = (rz - pz0) / (vz - vz0) = t0
-            // (rx - px1) / (vx - vx1) = (ry - py1) / (vy - vy1) = (rz - pz1) / (vz - vz1) = t1
-            // Eliminate t0, t1 by cross-multiplying and subtracting
-
-            // Set up 6 equations (x-y and x-z for 3 pairs)
             var hs = new[] { h0, h1, h2, h3 };
             var A = new double[6, 6];
             var B = new double[6];
@@ -136,21 +130,18 @@ public partial class Day24 : Day
                 var a = hs[0];
                 var b = hs[i];
 
-                // (rx - ax)/(vx - avx) = (ry - ay)/(vy - avy)
-                // Cross-multiplied:
-                // (rx - ax)*(vy - avy) = (ry - ay)*(vx - avx)
-                // Expand:
-                // rx*(vy - avy) - ax*(vy - avy) = ry*(vx - avx) - ay*(vx - avx)
+                // From: (rx - ax)/(vx - avx) = (ry - ay)/(vy - avy)
+                // Cross-multiplied and rearranged:
                 // rx*(vy - avy) - ry*(vx - avx) = ax*(vy - avy) - ay*(vx - avx)
 
-                // x-y equation
+                // x-y equation coefficients
                 A[2 * (i - 1), 0] = (b.v.y - a.v.y); // rx
                 A[2 * (i - 1), 1] = -(b.v.x - a.v.x); // ry
                 A[2 * (i - 1), 3] = -(b.p.y - a.p.y); // vx
                 A[2 * (i - 1), 4] = (b.p.x - a.p.x); // vy
                 B[2 * (i - 1)] = (b.p.x * b.v.y - a.p.x * a.v.y) - (b.p.y * b.v.x - a.p.y * a.v.x);
 
-                // x-z equation
+                // x-z equation coefficients
                 A[2 * (i - 1) + 1, 0] = (b.v.z - a.v.z); // rx
                 A[2 * (i - 1) + 1, 2] = -(b.v.x - a.v.x); // rz
                 A[2 * (i - 1) + 1, 3] = -(b.p.z - a.p.z); // vx
