@@ -3,17 +3,22 @@ trigger:
     include:
       - main
 
-pool:
-  name: 'Default'
+pr:
+  branches:
+    include:
+      - '*'
 
-variables:
-  buildConfiguration: 'Release'
-  BASH_ENV: /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-  NIX_CONFIG: extra-experimental-features = nix-command flakes
-
-steps:
-  - checkout: self
-
-  - script: |
-      nix build
-    displayName: 'Build and test' 
+jobs:
+  - job: BuildAndTest
+    displayName: "Build and test"
+    pool:
+      name: Default
+    variables:
+      BASH_ENV: /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+      NIX_CONFIG: extra-experimental-features = nix-command flakes
+    steps:
+      - checkout: self
+      - script: |
+          nix build
+        displayName:
+          "Nix build and test"
