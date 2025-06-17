@@ -19,6 +19,6 @@ jobs:
     steps:
       - checkout: self
       - script: |
-          nix build
+          NIX_PATH=nixpkgs=channel:nixos-24.05 nix build --option sandbox false --option allow-network true
         displayName:
           "Nix build and test"
