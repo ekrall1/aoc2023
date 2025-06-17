@@ -4,28 +4,16 @@ trigger:
       - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'Default'
 
 variables:
   buildConfiguration: 'Release'
+  BASH_ENV: /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+  NIX_CONFIG: extra-experimental-features = nix-command flakes
 
 steps:
   - checkout: self
 
-  - task: UseDotNet@2
-    inputs:
-      packageType: 'sdk'
-      version: '8.0.407'
-      installationPath: $(Agent.ToolsDirectory)/dotnet
-
   - script: |
-      dotnet restore Aoc2023/Aoc2023.sln
-    displayName: 'Restore project'
-
-  - script: |
-      dotnet build Aoc2023/Aoc2023.sln --configuration $(buildConfiguration)
-    displayName: 'Build project'
-
-  - script: |
-      dotnet test Aoc2023/Aoc2023.sln --verbosity normal --configuration $(buildConfiguration)
-    displayName: 'Run unit tests'
+      nix build
+    displayName: 'Build and test' 

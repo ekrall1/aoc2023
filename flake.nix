@@ -62,11 +62,11 @@
         localNugetRepo = pkgs.stdenv.mkDerivation {
           pname = "local-nuget-repo";
           version = "1.0";
-          src = mathnetPkg;
+          #src = mathnetPkg;
           unpackPhase = "true";
           buildPhase = ''
             mkdir -p $out
-            cp $src $out/MathNet.Numerics.5.0.0.nupkg
+            cp ${mathnetPkg} $out/MathNet.Numerics.5.0.0.nupkg
           '';
           installPhase = "true";
         };
@@ -98,20 +98,20 @@
 
                 dotnet restore ./Aoc2023/Aoc2023.csproj --configfile NuGet.Config
                 dotnet build ./Aoc2023/Aoc2023.csproj --configuration Debug
+
+                # Build test project
+                dotnet restore ./Aoc2023.Tests/Aoc2023.Tests.csproj --configfile NuGet.Config
+                dotnet build ./Aoc2023.Tests/Aoc2023.Tests.csproj --configuration Debug
           '';
 
           installPhase = ''
             mkdir -p $out
-            echo "Contents of bin/Debug/net8.0:"
-            ls -l ./Aoc2023/bin/Debug/net8.0 || true
             cp -r ./Aoc2023/bin/Debug/net8.0/* $out/
           '';
 
           checkPhase = ''
             echo "Running tests..."
-            dotnet restore Aoc2023.Tests/Aoc2023.Tests.csproj --configfile NuGet.Config
-            dotnet build Aoc2023.Tests/Aoc2023.Tests.csproj --configuration Debug
-            dotnet test Aoc2023.Tests/Aoc2023.Tests.csproj --no-restore --no-build --verbosity normal
+            dotnet test ./Aoc2023.Tests/Aoc2023.Tests.csproj --no-build --no-restore --verbosity normal
           '';
 
           doCheck = true;
