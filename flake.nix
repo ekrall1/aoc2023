@@ -89,7 +89,6 @@
             <configuration>
               <packageSources>
                 <add key="local" value="file://${localNugetRepo}" />
-                <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
               </packageSources>
             </configuration>
             EOF
