@@ -61,15 +61,29 @@
         localNugetRepo = pkgs.stdenv.mkDerivation {
           pname = "local-nuget-repo";
           version = "1.0";
-          src = ./nupkgs;
+          src = null;
+          dontUnpack = true;
+
+          buildInputs = [];
 
           buildPhase = ''
             mkdir -p $out
-            cp -r $src/* $out/
-          '';
+          '' + (lib.concatMapStringsSep "\n" (dep:
+            let
+              fileName = "${dep.name}.${dep.version}.nupkg";
+              nugetUrl = "https://www.nuget.org/api/v2/package/${dep.name}/${dep.version}";
+              fetched = pkgs.fetchurl {
+                url = nugetUrl;
+                sha256 = dep.sha256;
+              };
+            in ''
+              echo "[flake] Fetching ${fileName}"
+              cp ${fetched} $out/${fileName}
+            '') (import ./nuget-deps/deps.nix));
 
           installPhase = "true";
         };
+
 
         # build the project using explicit NuGet.Config to add local source
         aoc2023Build = pkgs.stdenv.mkDerivation {
