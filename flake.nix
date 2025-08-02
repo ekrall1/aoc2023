@@ -58,16 +58,16 @@
           }
         );
 
-        # derivation that puts the .nupkg into a folder
         localNugetRepo = pkgs.stdenv.mkDerivation {
           pname = "local-nuget-repo";
           version = "1.0";
-          #src = mathnetPkg;
-          unpackPhase = "true";
+          src = ./nupkgs;
+
           buildPhase = ''
             mkdir -p $out
-            cp ${mathnetPkg} $out/MathNet.Numerics.5.0.0.nupkg
+            cp -r $src/* $out/
           '';
+
           installPhase = "true";
         };
 
@@ -81,6 +81,8 @@
             pkgs.dotnet-sdk
             pkgs.unzip
           ];
+
+          buildInputs = [ localNugetRepo ];
 
           buildPhase = ''
                 # Write NuGet.Config to add local package source
@@ -115,8 +117,6 @@
 
           doCheck = true;
 
-          buildInputs = [ localNugetRepo ];
-
           dontFixup = true;
         };
       in
@@ -129,9 +129,16 @@
             vscode
             azure-iac-env
             azure-cli
+            nuget-to-nix.packages.${system}.default
           ];
           shellHook = ''
             echo "Welcome to the Aoc2023 dev shell."
+            if [ -f .hooks/pre-commit ]; then
+            mkdir -p .git/hooks
+            cp .hooks/pre-commit .git/hooks/pre-commit
+            chmod +x .git/hooks/pre-commit
+            echo "[devShell] Installed pre-commit hook."
+            fi
           '';
         };
       }
