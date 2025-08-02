@@ -23,11 +23,11 @@
           };
         };
 
-        # fetch the nuget package file
-        # mathnetPkg = pkgs.fetchurl {
-        #   url = "https://www.nuget.org/api/v2/package/MathNet.Numerics/5.0.0";
-        #   sha256 = "sha256-RHJCVM6OxquJF7n5Mbe/oNbucBbkge6ULcbAczOgmVo=";
-        # };
+        #fetch the nuget package file
+        mathnetPkg = pkgs.fetchurl {
+          url = "https://www.nuget.org/api/v2/package/MathNet.Numerics/5.0.0/MathNet.Numerics.5.0.0.nupkg";
+          sha256 = "sha256-RHJCVM6OxquJF7n5Mbe/oNbucBbkge6ULcbAczOgmVo=";
+        };
 
         lib = nixpkgs.lib;
 
