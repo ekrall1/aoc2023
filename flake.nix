@@ -132,7 +132,7 @@
           ];
           shellHook = ''
             echo "Welcome to the Aoc2023 dev shell."
-            if [ -f .hooks/pre-commit ]; then
+            if [ -f .hooks/pre-commit.sh ]; then
             mkdir -p .git/hooks
             cp .hooks/pre-commit.sh .git/hooks/pre-commit
             chmod +x .git/hooks/pre-commit
