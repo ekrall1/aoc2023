@@ -1,5 +1,5 @@
 {
-  description = "flake to build Aoc2023 with local MathNet.Numerics";
+  description = "flake to build Aoc2023";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -33,12 +33,6 @@
 
         dotnet = with pkgs; [
           dotnet-sdk
-        ];
-
-        azure-iac-env = with pkgs; [
-          pulumi-bin
-          pulumiPackages.pulumi-language-go
-          go
         ];
 
         azure-cli = pkgs.azure-cli.withExtensions [
@@ -141,7 +135,6 @@
           buildInputs = [
             dotnet
             vscode
-            azure-iac-env
             azure-cli
           ];
           shellHook = ''
