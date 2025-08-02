@@ -63,3 +63,12 @@ Aoc2023/Backup/
 Aoc2023/UpgradeLog.htm
 Aoc2023/Properties/launchSettings.json
 .editorconfig
+*.log
+*.png
+nupkgs/
+result
+package/
+lib/
+_*/
+*.nuspec
+*.p7s
