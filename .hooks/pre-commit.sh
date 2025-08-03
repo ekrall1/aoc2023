@@ -36,10 +36,14 @@ echo "[" > "$tmp_file"
 # Find and hash each unique .nupkg file
 find ./nupkgs -name '*.nupkg' -type f | sort | uniq | while read -r pkg; do
   filename=$(basename "$pkg")
-  name=$(echo "$filename" | sed -E 's/-[0-9][^-]*\.nupkg$//')
-  version=$(echo "$filename" | sed -E 's/.*-([0-9][^-]*)\.nupkg$/\1/')
+  
+  # Strip .nupkg suffix
+  pkgnamever="${filename%.nupkg}"
 
-  # skip if version or name failed to parse
+  # Extract version (assuming format <name>-<version>.nupkg)
+  version=$(echo "$pkgnamever" | sed -E 's/.*-([0-9]+\.[0-9]+(\.[0-9]+)?(\-[^.]*)?)$/\1/')
+  name=$(echo "$pkgnamever" | sed -E "s/-${version}$//")
+
   if [[ -z "$name" || -z "$version" ]]; then
     echo "[pre-commit] Skipping unrecognized package name: $filename"
     continue
