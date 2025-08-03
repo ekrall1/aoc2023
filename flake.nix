@@ -1,5 +1,5 @@
 {
-  description = "flake to build Aoc2023";
+  description = "flake to build Aoc2023 with local MathNet.Numerics";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -23,16 +23,22 @@
           };
         };
 
-        #fetch the nuget package file
-        #mathnetPkg = pkgs.fetchurl {
-        #  url = "https://www.nuget.org/api/v2/package/MathNet.Numerics/5.0.0";
-        #  sha256 = "sha256-RHJCVM6OxquJF7n5Mbe/oNbucBbkge6ULcbAczOgmVo=";
-        #};
+        # fetch the nuget package file
+        mathnetPkg = pkgs.fetchurl {
+          url = "https://www.nuget.org/api/v2/package/MathNet.Numerics/5.0.0";
+          sha256 = "sha256-RHJCVM6OxquJF7n5Mbe/oNbucBbkge6ULcbAczOgmVo=";
+        };
 
         lib = nixpkgs.lib;
 
         dotnet = with pkgs; [
           dotnet-sdk
+        ];
+
+        azure-iac-env = with pkgs; [
+          pulumi-bin
+          pulumiPackages.pulumi-language-go
+          go
         ];
 
         azure-cli = pkgs.azure-cli.withExtensions [
@@ -52,32 +58,18 @@
           }
         );
 
+        # derivation that puts the .nupkg into a folder
         localNugetRepo = pkgs.stdenv.mkDerivation {
           pname = "local-nuget-repo";
           version = "1.0";
-          src = null;
-          dontUnpack = true;
-
-          buildInputs = [];
-
+          #src = mathnetPkg;
+          unpackPhase = "true";
           buildPhase = ''
             mkdir -p $out
-          '' + (lib.concatMapStringsSep "\n" (dep:
-            let
-              fileName = "${dep.name}.${dep.version}.nupkg";
-              nugetUrl = "https://api.nuget.org/v3-flatcontainer/${lib.toLower dep.name}/${dep.version}/${lib.toLower dep.name}.${dep.version}.nupkg";
-              fetched = pkgs.fetchurl {
-                url = nugetUrl;
-                sha256 = dep.sha256;
-              };
-            in ''
-              echo "[flake] Fetching ${fileName}"
-              cp ${fetched} $out/${fileName}
-            '') (import ./nuget-deps/deps.nix));
-
+            cp ${mathnetPkg} $out/MathNet.Numerics.5.0.0.nupkg
+          '';
           installPhase = "true";
         };
-
 
         # build the project using explicit NuGet.Config to add local source
         aoc2023Build = pkgs.stdenv.mkDerivation {
@@ -90,8 +82,6 @@
             pkgs.unzip
           ];
 
-          buildInputs = [ localNugetRepo ];
-
           buildPhase = ''
                 # Write NuGet.Config to add local package source
                 cat > NuGet.Config <<EOF
@@ -99,6 +89,7 @@
             <configuration>
               <packageSources>
                 <add key="local" value="file://${localNugetRepo}" />
+                <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
               </packageSources>
             </configuration>
             EOF
@@ -125,6 +116,8 @@
 
           doCheck = true;
 
+          buildInputs = [ localNugetRepo ];
+
           dontFixup = true;
         };
       in
@@ -135,16 +128,11 @@
           buildInputs = [
             dotnet
             vscode
+            azure-iac-env
             azure-cli
           ];
           shellHook = ''
             echo "Welcome to the Aoc2023 dev shell."
-            if [ -f .hooks/pre-commit.sh ]; then
-              mkdir -p .git/hooks
-              cp .hooks/pre-commit.sh .git/hooks/pre-commit
-              chmod +x .git/hooks/pre-commit
-            echo "[devShell] Installed pre-commit hook."
-            fi
           '';
         };
       }
