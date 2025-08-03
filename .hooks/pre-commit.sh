@@ -30,6 +30,8 @@ echo "[pre-commit] Generating nuget-deps/deps.nix with sha256s..."
 mkdir -p nuget-deps
 deps_file=nuget-deps/deps.nix
 tmp_file=$(mktemp)
+# Always regenerate
+rm -f "$deps_file"
 
 echo "[" > "$tmp_file"
 
