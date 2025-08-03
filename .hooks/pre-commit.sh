@@ -35,13 +35,15 @@ echo "[" > "$tmp_file"
 
 # Find and hash each unique .nupkg file
 find ./nupkgs -name '*.nupkg' -type f | sort | uniq | while read -r pkg; do
-  filename=$(basename "$pkg")
-  
+  filename=$(basename "$pkg" | tr -d '\r\n')  # strip line endings just in case
+
+  echo "[pre-commit] Processing: $filename"
+
   # Strip .nupkg suffix
   pkgnamever="${filename%.nupkg}"
 
-  # Extract version (assuming format <name>-<version>.nupkg)
-  version=$(echo "$pkgnamever" | sed -E 's/.*-([0-9]+\.[0-9]+(\.[0-9]+)?(\-[^.]*)?)$/\1/')
+  # Extract version (e.g., 1.2.3 or 1.2.3-preview1)
+  version=$(echo "$pkgnamever" | sed -E 's/^.*-([0-9]+\.[0-9]+(\.[0-9]+)?(-[^-]+)?)$/\1/')
   name=$(echo "$pkgnamever" | sed -E "s/-${version}$//")
 
   if [[ -z "$name" || -z "$version" ]]; then
