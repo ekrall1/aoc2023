@@ -65,7 +65,7 @@
           '' + (lib.concatMapStringsSep "\n" (dep:
             let
               fileName = "${dep.name}.${dep.version}.nupkg";
-              nugetUrl = "https://api.nuget.org/v3-flatcontainer/package/${dep.name}/${dep.version}/${dep.name}.${dep.version}.nupkg";
+              nugetUrl = "https://api.nuget.org/v3-flatcontainer/${lib.toLower dep.name}/${dep.version}/${lib.toLower dep.name}.${dep.version}.nupkg";
               fetched = pkgs.fetchurl {
                 url = nugetUrl;
                 sha256 = dep.sha256;
