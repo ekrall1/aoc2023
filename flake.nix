@@ -65,7 +65,7 @@
           '' + (lib.concatMapStringsSep "\n" (dep:
             let
               fileName = "${dep.name}.${dep.version}.nupkg";
-              nugetUrl = "https://www.nuget.org/api/v2/package/${dep.name}/${dep.version}";
+              nugetUrl = "https://api.nuget.org/v3-flatcontainer/package/${dep.name}/${dep.version}/${dep.name}.${dep.version}.nupkg";
               fetched = pkgs.fetchurl {
                 url = nugetUrl;
                 sha256 = dep.sha256;
@@ -143,7 +143,7 @@
               mkdir -p .git/hooks
               cp .hooks/pre-commit.sh .git/hooks/pre-commit
               chmod +x .git/hooks/pre-commit
-              echo "[devShell] Installed pre-commit hook."
+            echo "[devShell] Installed pre-commit hook."
             fi
           '';
         };
