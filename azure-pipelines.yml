@@ -22,5 +22,6 @@ jobs:
           #!/bin/bash
 
           my_test="${MY_TEST_VAR:-${MY_TEST_VAR:-my-test}}"
+          echo "${my_test}"
         displayName:
           "Nix build and test"
