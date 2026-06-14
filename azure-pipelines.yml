@@ -21,7 +21,7 @@ jobs:
       - script: |
           #!/bin/bash
           
-          my_test="${PIPELINE_TEST:-${PIPELINE_TEST}:-}}"
+          my_test="${PIPELINE_TEST:-${PIPELINE_TEST:-}}"
           test1=()
           if [ -n "my_test" ]; then
             test1+=(--test-arg "$my_test")
