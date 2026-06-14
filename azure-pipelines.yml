@@ -19,18 +19,6 @@ jobs:
     steps:
       - checkout: self
       - script: |
-          #!/bin/bash
-          
-          my_test="${PIPELINE_TEST:-${PIPELINE_TEST:-}}"
-          test1=()
-          echo "$my_test"
-          if [ -n "$my_test" ]; then
-            test1+=(--test-arg "$my_test")
-          fi
-
-          echo "${test1[@]}"
-
-          echo "${TESTVAR:-${TESTVAR:-}}"
-          #NIX_PATH=nixpkgs=channel:nixos-24.05 nix build --option sandbox false
+          NIX_PATH=nixpkgs=channel:nixos-24.05 nix build --option sandbox false
         displayName:
           "Nix build and test"
